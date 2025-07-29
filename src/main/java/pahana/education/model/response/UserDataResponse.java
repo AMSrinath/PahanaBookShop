@@ -3,6 +3,7 @@ import pahana.education.model.request.UserRequest;
 import java.time.LocalDate;
 
 public class UserDataResponse {
+    private int id;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
@@ -16,10 +17,11 @@ public class UserDataResponse {
     private String title;
     private UserRoleResponse userRole;
 
-    public UserDataResponse(String firstName, String lastName, LocalDate dateOfBirth,
+    public UserDataResponse(int id,String firstName, String lastName, LocalDate dateOfBirth,
                             String phoneNo, UserRequest.Gender gender, String address,
                             String userImagePath, String accountNo, String email,
                             String userName, String title, UserRoleResponse userRole) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -32,6 +34,10 @@ public class UserDataResponse {
         this.userName = userName;
         this.title = title;
         this.userRole = userRole;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getFirstName() {

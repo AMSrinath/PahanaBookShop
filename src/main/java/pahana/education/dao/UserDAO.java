@@ -6,6 +6,7 @@ import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.UserDataResponse;
 import pahana.education.util.DBConnection;
+import pahana.education.util.JwtUtil;
 import pahana.education.util.enums.HttpStatusEnum;
 import pahana.education.util.mappers.UserMapper;
 
@@ -33,7 +34,7 @@ public class UserDAO {
         CommonResponse<UserDataResponse> response = null;
 
         try {
-            String sql = "SELECT usr.id, usr.first_name AS fName, usr.last_name AS lName, rl.id as roleId, rl.name as roleName, rl.title as roleTitle " +
+            String sql = "SELECT usr.id, usr.first_name AS fName, usr.last_name AS lName,usr.password, rl.id as roleId, rl.name as roleName, rl.title as roleTitle " +
                     "FROM user usr INNER JOIN user_role ur ON usr.id = ur.user_id " +
                     "INNER JOIN role rl on ur.role_id = rl.id " +
                     "WHERE usr.email=?";
@@ -49,14 +50,17 @@ public class UserDAO {
 
             String hashedPassword = rs.getString("password");
             BCrypt.Result result = BCrypt.verifyer().verify(loginRequest.getPassword().toCharArray(), hashedPassword);
-            if (result.verified) {
-                statusCode = HttpStatusEnum.OK.getCode();
-                message = "Login successful";
-                data = UserMapper.userDataResponse(rs);
-            } else {
+
+            if (!result.verified) {
                 statusCode = HttpStatusEnum.UNAUTHORIZED.getCode();
                 message = "Invalid password";
             }
+
+            statusCode = HttpStatusEnum.OK.getCode();
+            message = "Login successful";
+            data = UserMapper.userDataResponse(rs);
+            String token = JwtUtil.generateToken(data);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,6 +86,7 @@ public class UserDAO {
             isSuccess = rowsInserted > 0;
         } catch (Exception e) {
             e.printStackTrace();
+
         }
         return isSuccess;
     }

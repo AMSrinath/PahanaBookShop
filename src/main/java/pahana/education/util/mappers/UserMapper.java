@@ -16,6 +16,7 @@ public class UserMapper {
         );
 
         return new UserDataResponse(
+                rs.getInt("userId"),
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getDate("date_of_birth").toLocalDate(),
