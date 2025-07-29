@@ -4,8 +4,10 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import pahana.education.model.request.UserRequest;
 import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
+import pahana.education.model.response.UserDataResponse;
 import pahana.education.util.DBConnection;
 import pahana.education.util.enums.HttpStatusEnum;
+import pahana.education.util.mappers.UserMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,16 +26,19 @@ public class UserDAO {
         return instance;
     }
 
-    public CommonResponse<UserRequest> login(LoginRequest loginRequest) throws SQLException {
+    public CommonResponse<UserDataResponse> login(LoginRequest loginRequest) throws SQLException {
         int statusCode = 0;
         String message = "";
-        UserRequest data = null;
-        CommonResponse<UserRequest> response = null;
+        UserDataResponse data = null;
+        CommonResponse<UserDataResponse> response = null;
 
         try {
+            String sql = "SELECT usr.id, usr.first_name AS fName, usr.last_name AS lName, rl.id as roleId, rl.name as roleName, rl.title as roleTitle " +
+                    "FROM user usr INNER JOIN user_role ur ON usr.id = ur.user_id " +
+                    "INNER JOIN role rl on ur.role_id = rl.id " +
+                    "WHERE usr.email=?";
             Connection conn = DBConnection.getInstance().getConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT user.* FROM user  WHERE user.email=?");
-
+            PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, loginRequest.getEmail());
             ResultSet rs = stmt.executeQuery();
 
@@ -47,11 +52,7 @@ public class UserDAO {
             if (result.verified) {
                 statusCode = HttpStatusEnum.OK.getCode();
                 message = "Login successful";
-                UserRequest userRequest = new UserRequest();
-                userRequest.setId(rs.getInt("id"));
-                userRequest.setUserName(rs.getString("user_name"));
-                userRequest.setEmail(rs.getString("email"));
-                data = userRequest;
+                data = UserMapper.userDataResponse(rs);
             } else {
                 statusCode = HttpStatusEnum.UNAUTHORIZED.getCode();
                 message = "Invalid password";
