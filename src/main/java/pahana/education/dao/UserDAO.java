@@ -1,10 +1,10 @@
 package pahana.education.dao;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import pahana.education.model.request.UserRequest;
+import pahana.education.model.request.user.UserRequest;
 import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.UserDataResponse;
+import pahana.education.model.response.user.UserDataResponse;
 import pahana.education.util.DBConnection;
 import pahana.education.util.JwtUtil;
 import pahana.education.util.enums.HttpStatusEnum;
@@ -46,21 +46,21 @@ public class UserDAO {
             if (!rs.next()) {
                statusCode = HttpStatusEnum.NOT_FOUND.getCode();
                message = "Email does not exist";
+            } else {
+                String hashedPassword = rs.getString("password");
+                BCrypt.Result result = BCrypt.verifyer().verify(loginRequest.getPassword().toCharArray(), hashedPassword);
+
+                if (!result.verified) {
+                    statusCode = HttpStatusEnum.UNAUTHORIZED.getCode();
+                    message = "Invalid password";
+                } else {
+                    data = UserMapper.userDataResponse(rs);
+                    String token = JwtUtil.generateToken(data);
+
+                    statusCode = HttpStatusEnum.OK.getCode();
+                    message = "Login successful";
+                }
             }
-
-            String hashedPassword = rs.getString("password");
-            BCrypt.Result result = BCrypt.verifyer().verify(loginRequest.getPassword().toCharArray(), hashedPassword);
-
-            if (!result.verified) {
-                statusCode = HttpStatusEnum.UNAUTHORIZED.getCode();
-                message = "Invalid password";
-            }
-
-            statusCode = HttpStatusEnum.OK.getCode();
-            message = "Login successful";
-            data = UserMapper.userDataResponse(rs);
-            String token = JwtUtil.generateToken(data);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

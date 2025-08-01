@@ -1,8 +1,8 @@
 package pahana.education.util.mappers;
 
-import pahana.education.model.request.UserRequest;
-import pahana.education.model.response.UserDataResponse;
-import pahana.education.model.response.UserRoleResponse;
+import pahana.education.model.request.user.UserRequest;
+import pahana.education.model.response.user.UserDataResponse;
+import pahana.education.model.response.user.UserRoleResponse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

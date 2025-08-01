@@ -1,4 +1,4 @@
-package pahana.education.model.request;
+package pahana.education.model.request.user;
 
 import pahana.education.model.BaseModel;
 

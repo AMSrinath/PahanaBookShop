@@ -6,10 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import pahana.education.dao.UserDAO;
-import pahana.education.model.request.UserRequest;
 import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.UserDataResponse;
+import pahana.education.model.response.user.UserDataResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -40,7 +39,7 @@ public class LoginServlet extends HttpServlet {
             CommonResponse<UserDataResponse> userDAO = UserDAO.getInstance().login(loginRequest);
             if (userDAO.getCode() == 200) {
                 request.getSession().setAttribute("user", userDAO.getMessage());
-                response.sendRedirect("book-list");
+                response.sendRedirect("dashboard");
             } else {
                 request.setAttribute("error", userDAO.getMessage());
                 request.getRequestDispatcher("index.jsp").forward(request, response);

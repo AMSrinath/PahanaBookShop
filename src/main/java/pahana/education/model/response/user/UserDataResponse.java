@@ -1,5 +1,6 @@
-package pahana.education.model.response;
-import pahana.education.model.request.UserRequest;
+package pahana.education.model.response.user;
+import pahana.education.model.request.user.UserRequest;
+
 import java.time.LocalDate;
 
 public class UserDataResponse {
