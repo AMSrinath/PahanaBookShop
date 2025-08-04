@@ -1,6 +1,7 @@
 package pahana.education.model.request.inventory;
 
 public class InventoryTypeRequest {
+    private int id;
     private String name;
 
     public String getName() {
@@ -9,5 +10,13 @@ public class InventoryTypeRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
