@@ -77,9 +77,6 @@ public class InventoryDao {
             countStmt.close();
 
 
-
-
-//            PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type");
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type LIMIT ? OFFSET ?");
             ps.setInt(1, limit);
             ps.setInt(2, offset);
@@ -138,6 +135,31 @@ public class InventoryDao {
             }
         } catch (Exception e) {
             throw new ServletException("Invalid ID format.");
+        }
+    }
+
+    public CommonResponse<String> deleteInventoryType(int id) throws SQLException {
+
+        try{
+//            String sql = "DELETE FROM inventory_type WHERE id = ?";
+            String sql = "UPDATE inventory_type SET is_deleted = 1 WHERE id = ?";
+            Connection conn = DBConnection.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, id);
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                return new CommonResponse<>(200, "Inventory type deleted successfully", null);
+            } else {
+                return new CommonResponse<>(404, "Inventory type not found", null);
+            }
+        } catch (SQLException e) {
+            return new CommonResponse<>(
+                    500,
+                    "Database error: " + e.getMessage(),
+                    null
+            );
         }
     }
 }

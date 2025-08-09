@@ -120,6 +120,27 @@ public class InventoryTypeServlet extends HttpServlet {
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String idParam = request.getParameter("id");
+        if (idParam == null || idParam.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID parameter");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(idParam);
+            CommonResponse<String> deleteResponse = InventoryDao.getInstance().deleteInventoryType(id);
+
+            if (deleteResponse.getCode() == 200) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(deleteResponse.getMessage());
+            } else {
+                response.sendError(deleteResponse.getCode(), deleteResponse.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Delete failed: " + e.getMessage());
+        }
     }
 
     public void destroy() {}

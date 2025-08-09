@@ -14,7 +14,7 @@
         <div class="container-fluid">
             <div class="action-header">
                 <button id="" class="btn btn-primary">
-                    <a href="product-type-list.jsp">
+                    <a href="${pageContext.request.contextPath}/src/pages/product-type-list.jsp">
                         <i class="fas fa-arrow-left me-2"></i>Back to Product Types
                     </a>
                 </button>

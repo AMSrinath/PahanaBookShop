@@ -136,24 +136,40 @@
     </div>
 </div>
 
-
 <script>
     let deleteId = null;
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+
+    // Bind delete buttons
     document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function () {
+        button.addEventListener('click', function() {
             deleteId = this.getAttribute('data-id');
-            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            modal.show();
+            deleteModal.show();
         });
     });
 
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-        if (deleteId) {
-            console.log("AAAA");
-            <%--window.location.href = `${request.getContextPath()}/inventory-type/delete?id=${deleteId}`;--%>
-        }
-    });
+    // Confirm delete action
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (!deleteId) return;
 
+        fetch(`<%= request.getContextPath() %>/inventory-type?id=\${deleteId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload(); // Reload page on success
+                } else {
+                    response.text().then(text => {
+                        alert(`Delete failed: \${text}`);
+                        deleteModal.hide();
+                    });
+                }
+            })
+            .catch(error => {
+                alert('Network error: ' + error.message);
+                deleteModal.hide();
+            });
+    });
 </script>
 
 <%@ include file="../includes/footer.jsp" %>
