@@ -8,15 +8,25 @@ public class CommonResponse <T> {
     private String message;
     private String timestamp;
     private T data = null;
+    private int totalCount;
 
     public CommonResponse() {
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
     }
-    public CommonResponse(int code, String message, T data) {
+    public CommonResponse(int code, String message, T data, int totalCount) {
         this.code = code;
         this.message = message;
         this.data = data;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);;
+        this.totalCount = totalCount;
+    }
+
+    public CommonResponse(int code, String message, T data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+        this.totalCount = 0;
     }
 
 
@@ -46,6 +56,14 @@ public class CommonResponse <T> {
 
     public T getData() {
         return data;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
     }
 
     public void setData(T data) {

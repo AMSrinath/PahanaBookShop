@@ -31,7 +31,6 @@ public class UserDAO {
         int statusCode = 0;
         String message = "";
         UserDataResponse data = null;
-        CommonResponse<UserDataResponse> response = null;
 
         try {
             String sql = "SELECT usr.id, usr.first_name AS fName, usr.last_name AS lName,usr.password, rl.id as roleId, rl.name as roleName, rl.title as roleTitle " +

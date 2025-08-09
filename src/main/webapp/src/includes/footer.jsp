@@ -47,11 +47,11 @@
     });
 
     // Form submission handling
-    document.getElementById('customerForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        alert('Customer added successfully!');
-        this.reset();
-    });
+    // document.getElementById('customerForm').addEventListener('submit', function (e) {
+    //     e.preventDefault();
+    //     alert('Customer added successfully!');
+    //     this.reset();
+    // });
 
     // Delete button handling
     document.querySelectorAll('.btn-danger').forEach(button => {
@@ -76,22 +76,22 @@
     const customerForm = document.getElementById('customerForm');
 
     // Show form for adding new customer
-    addCustomerBtn.addEventListener('click', function () {
-        document.getElementById('customers-view').classList.remove('active');
-        document.getElementById('customer-form-view').classList.add('active');
-        formTitle.innerHTML = '<i class="fas fa-user-plus me-2"></i>Add New Customer';
-        saveBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Save';
-        clearBtn.textContent = 'Clear';
-        customerForm.reset();
-        document.getElementById('page-title').textContent = 'Add Customer';
-    });
+    // addCustomerBtn.addEventListener('click', function () {
+    //     document.getElementById('customers-view').classList.remove('active');
+    //     document.getElementById('customer-form-view').classList.add('active');
+    //     formTitle.innerHTML = '<i class="fas fa-user-plus me-2"></i>Add New Customer';
+    //     saveBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Save';
+    //     clearBtn.textContent = 'Clear';
+    //     customerForm.reset();
+    //     document.getElementById('page-title').textContent = 'Add Customer';
+    // });
 
     // Back to customers list
-    backToCustomers.addEventListener('click', function () {
-        document.getElementById('customer-form-view').classList.remove('active');
-        document.getElementById('customers-view').classList.add('active');
-        document.getElementById('page-title').textContent = 'Customers';
-    });
+    // backToCustomers.addEventListener('click', function () {
+    //     document.getElementById('customer-form-view').classList.remove('active');
+    //     document.getElementById('customers-view').classList.add('active');
+    //     document.getElementById('page-title').textContent = 'Customers';
+    // });
 
     // Edit customer button handling
     document.querySelectorAll('.edit-btn').forEach(button => {
