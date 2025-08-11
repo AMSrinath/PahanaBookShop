@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import pahana.education.dao.UserDAO;
 import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.user.UserDataResponse;
+import pahana.education.model.response.UserDataResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;

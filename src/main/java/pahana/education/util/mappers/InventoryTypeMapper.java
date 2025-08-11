@@ -1,6 +1,6 @@
 package pahana.education.util.mappers;
 
-import pahana.education.model.response.inventory.InventoryTypeResponse;
+import pahana.education.model.response.InventoryTypeResponse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

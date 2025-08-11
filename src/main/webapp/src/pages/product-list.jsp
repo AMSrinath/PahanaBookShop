@@ -12,7 +12,7 @@
             <div class="action-header">
                 <h2 class="page-title"></h2>
                 <button id="add-customer-btn" class="btn btn-primary">
-                    <a href="user-form.jsp">
+                    <a href="${pageContext.request.contextPath}/inventory">
                         <i class="fas fa-plus me-2"></i>Add New Product
                     </a>
                 </button>
@@ -21,7 +21,7 @@
             <div class="row">
                 <div class="customer-table">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3><i class="fas fa-users me-2"></i>Product Type List</h3>
+                        <h3><i class="fas fa-users me-2"></i>Product List</h3>
                         <div class="d-flex">
                             <input type="text" class="form-control me-2" placeholder="Search customers"
                                    id="searchInput">

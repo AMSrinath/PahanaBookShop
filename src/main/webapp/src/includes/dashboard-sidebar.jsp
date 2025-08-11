@@ -5,7 +5,8 @@
 
     <ul class="nav flex-column sidebar-nav">
         <li class="nav-item">
-            <a class="nav-link active" href="../pages/dashboard.jsp" data-view="dashboard">
+<%--            <a class="nav-link active" href="../pages/dashboard.jsp" data-view="dashboard">--%>
+            <a class="nav-link active" href="${pageContext.request.contextPath}/src/pages/dashboard.jsp" data-view="dashboard">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
@@ -20,7 +21,8 @@
                         <a class="nav-link" href="${pageContext.request.contextPath}/inventory-type" data-view="artwork"><i class="fas fa-paint-brush me-2"></i>Product types</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="../pages/product-list.jsp" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>
+<%--                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>--%>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/src/pages/product-list.jsp" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>
                     </li>
                     <li><a class="nav-link" href="../pages/product-price-list.jsp" data-view="products"><i class="fas fa-box me-2"></i>Product Price</a>
                     </li>

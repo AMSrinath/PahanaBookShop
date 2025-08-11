@@ -384,3 +384,20 @@ body {
 .btn-outline-secondary:hover {
     background: var(--light-gray);
 }
+
+
+.image-preview-form {
+    width: 200px;
+    height: 200px;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+.image-preview-form img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}

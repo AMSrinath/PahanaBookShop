@@ -6,9 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import pahana.education.dao.InventoryDao;
-import pahana.education.model.request.inventory.InventoryTypeRequest;
+import pahana.education.model.request.InventoryTypeRequest;
 import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.inventory.InventoryTypeResponse;
+import pahana.education.model.response.InventoryTypeResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,9 +31,9 @@ public class InventoryTypeServlet extends HttpServlet {
         if (idParam != null && !idParam.isEmpty()) {
             try {
                 int id = Integer.parseInt(idParam);
-                CommonResponse<InventoryTypeResponse> singleInventoryType = InventoryDao.getInstance().getInventoryTypeById(id);
-                if (singleInventoryType.getData() != null) {
-                    request.setAttribute("inventoryType", singleInventoryType.getData());
+                CommonResponse<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getInventoryTypeById(id);
+                if (inventoryType.getData() != null) {
+                    request.setAttribute("inventoryType", inventoryType.getData());
                     request.getRequestDispatcher("/src/pages/product-type-form.jsp").forward(request, response);
                 } else {
                     request.setAttribute("errorMessage", "Inventory type not found");
@@ -57,7 +57,7 @@ public class InventoryTypeServlet extends HttpServlet {
 
             int offset = (page - 1) * pageSize;
             try {
-                inventoryTypes = InventoryDao.getInstance().getAllInventoryTypes(pageSize, offset);
+                inventoryTypes = InventoryDao.getInstance().getAllInventoryTypesPaginate(pageSize, offset);
 
                 int totalRecords = inventoryTypes.getTotalCount(); // add getter in CommonResponse
                 int totalPages = (int) Math.ceil((double) totalRecords / pageSize);

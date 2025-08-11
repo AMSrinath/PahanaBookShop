@@ -1,44 +1,27 @@
-package pahana.education.model.response.user;
-import pahana.education.model.request.user.UserRequest;
+package pahana.education.model.request;
+
+import pahana.education.model.BaseModel;
 
 import java.time.LocalDate;
 
-public class UserDataResponse {
-    private int id;
+public class UserRequest extends BaseModel {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
     private String phoneNo;
-    private UserRequest.Gender gender;
+    private Gender gender;
     private String address;
     private String userImagePath;
+    private String password;
     private String accountNo;
     private String email;
     private String userName;
     private String title;
-    private UserRoleResponse userRole;
 
-    public UserDataResponse(int id,String firstName, String lastName, LocalDate dateOfBirth,
-                            String phoneNo, UserRequest.Gender gender, String address,
-                            String userImagePath, String accountNo, String email,
-                            String userName, String title, UserRoleResponse userRole) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
-        this.phoneNo = phoneNo;
-        this.gender = gender;
-        this.address = address;
-        this.userImagePath = userImagePath;
-        this.accountNo = accountNo;
-        this.email = email;
-        this.userName = userName;
-        this.title = title;
-        this.userRole = userRole;
-    }
 
-    public int getId() {
-        return id;
+    public enum Gender {
+        MALE,
+        FEMALE
     }
 
     public String getFirstName() {
@@ -73,11 +56,11 @@ public class UserDataResponse {
         this.phoneNo = phoneNo;
     }
 
-    public UserRequest.Gender getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(UserRequest.Gender gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
@@ -95,6 +78,14 @@ public class UserDataResponse {
 
     public void setUserImagePath(String userImagePath) {
         this.userImagePath = userImagePath;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getAccountNo() {
@@ -127,13 +118,5 @@ public class UserDataResponse {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public UserRoleResponse getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRoleResponse userRole) {
-        this.userRole = userRole;
     }
 }

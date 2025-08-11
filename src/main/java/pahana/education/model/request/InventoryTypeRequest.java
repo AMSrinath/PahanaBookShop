@@ -1,4 +1,4 @@
-package pahana.education.model.request.inventory;
+package pahana.education.model.request;
 
 public class InventoryTypeRequest {
     private int id;
