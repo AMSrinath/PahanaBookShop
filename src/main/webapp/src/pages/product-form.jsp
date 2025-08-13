@@ -46,7 +46,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Inventory Type</label>
-                            <select class="form-select" name="inventoryType" required>
+                            <select class="form-select" name="inventoryTypeId" required>
                                 <option value="">-- Select Inventory Type --</option>
                                 <%
                                     List<InventoryTypeResponse> inventoryTypes = (List<InventoryTypeResponse>) request.getAttribute("inventoryTypes");
@@ -63,14 +63,14 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Author</label>
-                            <select class="form-select" name="author" required>
+                            <select class="form-select" name="authorId" required>
                                 <option value="">-- Select Author --</option>
                                 <%
                                     List<AuthorDataResponse> authorList = (List<AuthorDataResponse>) request.getAttribute("authorList");
                                     if (authorList != null) {
-                                        for (AuthorDataResponse type : authorList) {
+                                        for (AuthorDataResponse auth : authorList) {
                                 %>
-                                <option value="<%= type.getId() %>"><%= type.getFullName() %></option>
+                                <option value="<%= auth.getId() %>"><%= auth.getFullName() %></option>
                                 <%
                                         }
                                     }
@@ -81,6 +81,23 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">ISBN Number</label>
                             <input type="text" class="form-control" name="isbnNo" value="">
+                        </div>
+
+                        <h4 class="mt-4 mb-3">Pricing & Stock</h4>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Retail Price (Rs)</label>
+                            <input type="number" class="form-control" name="retailPrice" value="">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Cost Price (Rs)</label>
+                            <input type="number" class="form-control" name="costPrice" value="">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Quantity on Hand</label>
+                            <input type="number" class="form-control" name="qtyHand" value="">
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -107,31 +124,14 @@
                                     <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" style="display: none;">
                                 </div>
 
-                                <div class="mt-2">
-                                    <button type="button" class="btn btn-sm btn-outline-danger" id="removeImageBtn" style="">
-                                        <%-- style="<%= (inventory == null || inventory.getDefaultImage() == null || inventory.getDefaultImage().isEmpty()) ? "display: none;" : "" %>">--%>
-                                        <i class="fas fa-trash me-1"></i> Remove Image
-                                    </button>
-                                </div>
+<%--                                    <div class="mt-2">--%>
+<%--                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeImageBtn"--%>
+<%--                                                style="">--%>
+<%--                                            &lt;%&ndash; style="<%= (inventory == null || inventory.getDefaultImage() == null || inventory.getDefaultImage().isEmpty()) ? "display: none;" : "" %>">&ndash;%&gt;--%>
+<%--                                            <i class="fas fa-trash me-1"></i> Remove Image--%>
+<%--                                        </button>--%>
+<%--                                    </div>--%>
                             </div>
-                        </div>
-
-
-                        <h4 class="mt-4 mb-3">Pricing & Stock</h4>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Retail Price (Rs)</label>
-                            <input type="number" class="form-control" name="retailPrice" value="">
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Cost Price (Rs)</label>
-                            <input type="number" class="form-control" name="costPrice" value="">
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Quantity on Hand</label>
-                            <input type="number" class="form-control" name="qtyHand" value="">
                         </div>
                     </div>
                 </form>
@@ -143,7 +143,84 @@
 
 <script>
     $(document).ready(function() {
+        const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+
+        // Show validation error
+        function showError(message) {
+            $('#toastMessage').text(message);
+            errorToast.show();
+        }
+
+        // Field validation
+        function validateField(selector, message) {
+            const $field = $(selector);
+            let isValid = true;
+
+            if ($field.prop('required')) {
+                if ($field.is('select') && $field.val() === '') {
+                    $field.addClass('is-invalid');
+                    showError(message);
+                    isValid = false;
+                } else if ($field.is('input') && !$field.val().trim()) {
+                    $field.addClass('is-invalid');
+                    showError(message);
+                    isValid = false;
+                }
+            }
+
+            // Special validation for author when novels selected
+            if (selector === '[name="authorId"]') {
+                const isNovel = $('[name="inventoryTypeId"] option:selected').text().toLowerCase().includes('novel');
+                if (isNovel && $field.val() === '') {
+                    $field.addClass('is-invalid');
+                    showError(message);
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        // Validate all fields
+        function validateForm() {
+            let isValid = true;
+
+            // Clear previous errors
+            $('.is-invalid').removeClass('is-invalid');
+
+            // Validate required fields
+            isValid &= validateField('[name="barcode"]', 'Please enter a barcode');
+            isValid &= validateField('[name="itemName"]', 'Please enter an item name');
+            isValid &= validateField('[name="inventoryTypeId"]', 'Please select an inventory type');
+            isValid &= validateField('[name="authorId"]', 'Please select an author for novels');
+
+            // Validate numeric fields
+            const numericFields = [
+                {selector: '[name="retailPrice"]', message: 'Retail price must be a positive number'},
+                {selector: '[name="costPrice"]', message: 'Cost price must be a positive number'},
+                {selector: '[name="qtyHand"]', message: 'Quantity must be a positive integer'}
+            ];
+
+            numericFields.forEach(field => {
+                const value = $(field.selector).val();
+                if (value && (isNaN(value) || parseFloat(value) <= 0)) {
+                    $(field.selector).addClass('is-invalid');
+                    showError(field.message);
+                    isValid = false;
+                }
+            });
+            return isValid;
+        }
+
+        $('input, select').on('input change', function() {
+            $(this).removeClass('is-invalid');
+        });
+
+
+        //save button
         $("#save-btn").click(function() {
+            if (!validateForm()) return;
+
             const formData = new FormData($("#productForm")[0]);
             $.ajax({
                 url: "${pageContext.request.contextPath}/inventory",
@@ -162,6 +239,7 @@
             });
         });
 
+        //clear button
         $("#clear-btn").click(function() {
             $("#productForm")[0].reset();
             $("#previewImage").attr("src", "").hide();
@@ -190,10 +268,33 @@
             $(".fa-image").show();
         });
 
+///////////////////////////////////////////////////
+        function toggleAuthorField() {
+            const selectedText = $('[name="inventoryTypeId"] option:selected').text().toLowerCase();
+            const isNovel = selectedText.includes('novel'); // Case-insensitive check
 
+            $('[name="authorId"]').prop('disabled', !isNovel)
+                .closest('.mb-3').toggleClass('field-disabled', !isNovel);
 
+            if (!isNovel) $('[name="authorId"]').val('');
+        }
+
+        // Initialize and bind events
+        toggleAuthorField();
+        $('[name="inventoryTypeId"]').change(toggleAuthorField);
     });
+
+
 </script>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 
 
 <%--<script>--%>

@@ -1,6 +1,7 @@
 package pahana.education.controller.inventory;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,12 +11,14 @@ import pahana.education.model.request.InventoryTypeRequest;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.InventoryTypeResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "inventoryTypeServlet", value = "/inventory-type")
+@MultipartConfig
 public class InventoryTypeServlet extends HttpServlet {
     private List<String> inventoryTypes;
     public void init() {
@@ -76,44 +79,47 @@ public class InventoryTypeServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HashMap<String, String> errors = new HashMap<>();
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
         String id = request.getParameter("id");
         String productTypeName = request.getParameter("productTypeName");
-        HashMap<String, String> errors = new HashMap<>();
-
-        if (productTypeName == null || productTypeName.trim().isEmpty()) {
-            errors.put("inventoryType", "Product type is required");
-        }
-
-        if (!errors.isEmpty()) {
-            request.setAttribute("errors", errors);
-            request.getRequestDispatcher("product-type-form.jsp").forward(request, response);
-            return;
-        }
 
         InventoryTypeRequest inventoryTypeRequest = new InventoryTypeRequest();
         inventoryTypeRequest.setName(productTypeName);
 
         try {
-            CommonResponse<String> inventoryDao;
+            CommonResponse<String> inventoryType;
             if (id != null && !id.isEmpty()) {
                 int typeId = Integer.parseInt(id);
                 inventoryTypeRequest.setId(typeId);
-                inventoryDao = InventoryDao.getInstance().updateInventoryType(inventoryTypeRequest);
+                inventoryType = InventoryDao.getInstance().updateInventoryType(inventoryTypeRequest);
             } else {
-                inventoryDao = InventoryDao.getInstance().createInventoryType(inventoryTypeRequest);
+                inventoryType = InventoryDao.getInstance().createInventoryType(inventoryTypeRequest);
             }
 
-            if (inventoryDao.getCode() == 200) {
-                request.setAttribute("successMessage", inventoryDao.getMessage());
-                response.sendRedirect(request.getContextPath() + "/inventory-type");
-            } else {
-                request.setAttribute("error", inventoryDao.getMessage());
-                request.getRequestDispatcher("/pages/product-type-form.jsp").forward(request, response);
-            }
-
+            String jsonResponse = getJsonResponse(inventoryType);
+            out.write(jsonResponse);
+            out.flush();
+            
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getJsonResponse(CommonResponse<String> inventoryType) {
+        String jsonResponse = "";
+        if (inventoryType.getCode() == 400 || inventoryType.getCode() == 500) {
+            jsonResponse = String.format("{\"code\": %d, \"message\": \"%s\"}",
+                    inventoryType.getCode(),
+                    inventoryType.getMessage().replace("\"", "\\\"")); // escape quotes
+        }  else {
+            jsonResponse = String.format("{\"code\": %d, \"message\": \"%s\"}",
+                    inventoryType.getCode(),
+                    inventoryType.getMessage().replace("\"", "\\\"")); // escape quotes
+        }
+        return jsonResponse;
     }
 
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

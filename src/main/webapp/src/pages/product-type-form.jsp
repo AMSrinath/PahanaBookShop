@@ -1,6 +1,7 @@
 <%@ page import="pahana.education.model.response.InventoryTypeResponse" %>
+<%@ page import="java.util.Map" %>
 <%
-    String pageTitle = "Dashboard";
+    String pageTitle = "Product Type";
     String idParam = request.getParameter("id");
     InventoryTypeResponse inventoryType = (InventoryTypeResponse) request.getAttribute("inventoryType");
 %>
@@ -14,7 +15,7 @@
         <div class="container-fluid">
             <div class="action-header">
                 <button id="" class="btn btn-primary">
-                    <a href="${pageContext.request.contextPath}/src/pages/product-type-list.jsp">
+                    <a href="${pageContext.request.contextPath}/inventory-type">
                         <i class="fas fa-arrow-left me-2"></i>Back to Product Types
                     </a>
                 </button>
@@ -34,7 +35,7 @@
                         </div>
                     </div>
 
-                    <form id="inventory-type-form" action="${pageContext.request.contextPath}/inventory-type" method="post">
+                    <form id="product-type-form" method="post" enctype="multipart/form-data">
                         <div class="row">
                             <input type="hidden" name="id" id="productTypeId" value="<%= (inventoryType != null) ? inventoryType.getId() : "" %>">
                             <div class="col-md-6 mb-3">
@@ -53,6 +54,15 @@
 </div>
 
 
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
         const idParam = '<%= (idParam != null) ? idParam : "" %>';
@@ -61,11 +71,57 @@
             $('#form-title').html('<i class="fas fa-edit me-2"></i>Update Product Type');
             $('#save-btn').html('<i class="fas fa-save me-2"></i>Update');
         }
+
+
+        $("#save-btn").click(function() {
+            const productTypeName = $("#productTypeName").val().trim();
+            if (!productTypeName) {
+                showToast("Product Type Name is required.", "error");
+                return;
+            }
+
+            const formData = new FormData($("#product-type-form")[0]);
+            $.ajax({
+                url: "<%= request.getContextPath() %>/inventory-type",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.code == 200) {
+                        showToast(response.message, "success");
+                        setTimeout(() => {
+                            window.location.href = "<%= request.getContextPath() %>/inventory-type";
+                        }, 2000);
+                    } else {
+                        showToast(response.message || "Something went wrong", "error");
+                    }
+                },
+                error: function (xhr) {
+                    showToast("Request failed: ","error");
+                }
+            });
+        });
     });
 
-    document.getElementById("save-btn").addEventListener("click", function () {
-        document.getElementById("inventory-type-form").submit();
-    });
+    // document.getElementById("save-btn").addEventListener("click", function () {
+    //     console.log('Save button clicked');
+    //     document.getElementById("inventory-type-form").submit();
+    // });
+
+
+    function showToast(message, type) {
+        const toastEl = document.getElementById('errorToast');
+        const toastBody = document.getElementById('toastMessage');
+
+        toastBody.innerText = message;
+        toastEl.classList.remove('bg-success', 'bg-danger');
+        toastEl.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
+
+        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        toast.show();
+    }
+
 </script>
 
 

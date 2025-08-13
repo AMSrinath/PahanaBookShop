@@ -44,6 +44,8 @@ public class InventoryDao {
                     statusCode = HttpStatusEnum.OK.getCode();
                     message = "Inventory type created successfully";
                 }
+            } else {
+                return new CommonResponse<>(400, "Inventory type not create,", null);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -274,15 +276,15 @@ public class InventoryDao {
                 try {
                     conn.rollback(); // rollback only works if auto-commit is false
                 } catch (SQLException rollbackEx) {
-                    rollbackEx.printStackTrace(); // Optional: log rollback failure
+                    rollbackEx.printStackTrace();
                 }
             }
             return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true); // Reset for next use
-                    conn.close(); // Don't forget to close
+                    conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

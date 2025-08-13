@@ -29,10 +29,8 @@ import java.util.List;
         maxRequestSize = 1024 * 1024 * 10
 )
 public class InventoryServlet extends HttpServlet {
-    private static final String UPLOAD_DIR = "/src/assets/images/uploads";
-    private List<String> inventoryTypes;
+    private static final String UPLOAD_DIR = "uploads";
     public void init() {
-        inventoryTypes = List.of("Electronics", "Furniture", "Books", "Clothing", "Toys");
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -88,8 +86,8 @@ public class InventoryServlet extends HttpServlet {
         try {
             String barcode = request.getParameter("barcode");
             String itemName = request.getParameter("itemName");
-            int inventoryTypeId = CommonUtil.checkIntValue(request.getParameter("inventoryType"), 0);
-            int authorId = CommonUtil.checkIntValue(request.getParameter("author"), 0);
+            int inventoryTypeId = CommonUtil.checkIntValue(request.getParameter("inventoryTypeId"), 0);
+            int authorId = CommonUtil.checkIntValue(request.getParameter("authorId"), 0);
             String isbnNo = request.getParameter("isbnNo");
             double retailPrice = CommonUtil.checkDoubleValue(request.getParameter("retailPrice"), 0);
             double costPrice =  CommonUtil.checkDoubleValue(request.getParameter("costPrice"),0);
@@ -112,15 +110,19 @@ public class InventoryServlet extends HttpServlet {
             String inventoryTypes = inventoryTypeByIdData.getData().getName().toUpperCase();
 
 
-//            if (barcode == null || barcode.trim().isEmpty()) {
-//                errors.put("barcode", "Barcode is required");
-//            } else if (isBarcodeExist) {
-//                errors.put("barcode", "Barcode already exists");
-//            } else if(inventoryTypeId == 0 ) {
-//                errors.put("inventoryType", "Inventory type is required");
-//            } else if(inventoryTypes == "NOVELS" &&  ) {
-//
-//            }
+            if (barcode == null || barcode.trim().isEmpty()) {
+                errors.put("barcode", "Barcode is required");
+            } else if (isBarcodeExist) {
+                errors.put("barcode", "Barcode already exists");
+            } else if(inventoryTypeId == 0 ) {
+                errors.put("inventoryType", "Inventory type is required");
+            }
+
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors);
+                request.getRequestDispatcher("product-form.jsp").forward(request, response);
+                return;
+            }
 
             // Create request object
             InventoryRequest invRequest = new InventoryRequest();

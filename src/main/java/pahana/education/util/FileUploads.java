@@ -11,7 +11,7 @@ public class FileUploads {
 
     public static String handleFileUpload(HttpServletRequest request, Part filePart, String UPLOAD_DIR)
             throws IOException {
-        String appPath = request.getServletContext().getRealPath("/uploads");
+        String appPath = request.getServletContext().getRealPath("");
 
         File uploadDir = new File(appPath + UPLOAD_DIR);
         if (!uploadDir.exists()) uploadDir.mkdirs();
@@ -20,7 +20,7 @@ public class FileUploads {
         String filePath = uploadDir + File.separator + fileName;
 
         filePart.write(filePath);
-        return UPLOAD_DIR + "/" + fileName;
+        return "/" + UPLOAD_DIR + "/" + fileName;
     }
 
     private static String extractFileName(Part part) {

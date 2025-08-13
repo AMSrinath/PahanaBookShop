@@ -401,3 +401,29 @@ body {
     max-height: 100%;
     object-fit: cover;
 }
+
+**********************************
+
+.custom-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 5px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 9999;
+}
+
+.custom-toast.show {
+    opacity: 1;
+}
+
+.custom-toast.bg-success {
+    background-color: #28a745;
+}
+
+.custom-toast.bg-danger {
+    background-color: #dc3545;
+}

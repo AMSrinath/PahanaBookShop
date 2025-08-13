@@ -11,8 +11,9 @@ public class AuthorDataResponse {
     private Gender  gender;
     private String email;
 
-    public AuthorDataResponse(String firstName, String lastName, String dateOfBirth,
+    public AuthorDataResponse(int id,String firstName, String lastName, String dateOfBirth,
                               String phoneNo, Gender gender, String email) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
