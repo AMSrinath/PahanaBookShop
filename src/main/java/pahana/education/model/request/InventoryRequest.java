@@ -5,7 +5,7 @@ public class InventoryRequest {
     private String barcode;
     private String name;
     private String defaultImage;
-    private int inventoryType;
+    private int inventoryTypeId;
     private int authorId;
     private String isbnNo;
     private double retailPrice;
@@ -44,12 +44,12 @@ public class InventoryRequest {
         this.defaultImage = defaultImage;
     }
 
-    public Integer getInventoryType() {
-        return inventoryType;
+    public Integer getInventoryTypeId() {
+        return inventoryTypeId;
     }
 
-    public void setInventoryType(Integer inventoryType) {
-        this.inventoryType = inventoryType;
+    public void setInventoryTypeId(Integer inventoryType) {
+        this.inventoryTypeId = inventoryType;
     }
 
     public Integer getAuthorId() {

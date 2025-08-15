@@ -4,10 +4,12 @@ import jakarta.servlet.ServletException;
 import pahana.education.model.request.InventoryRequest;
 import pahana.education.model.request.InventoryTypeRequest;
 import pahana.education.model.response.CommonResponse;
+import pahana.education.model.response.InventoryResponse;
 import pahana.education.model.response.InventoryTypeResponse;
 import pahana.education.model.response.UserDataResponse;
 import pahana.education.util.DBConnection;
 import pahana.education.util.enums.HttpStatusEnum;
+import pahana.education.util.mappers.InventoryMapper;
 import pahana.education.util.mappers.InventoryTypeMapper;
 
 import java.sql.*;
@@ -65,7 +67,7 @@ public class InventoryDao {
 
         try {
             Connection conn = DBConnection.getInstance().getConnection();
-            PreparedStatement countStmt = conn.prepareStatement("SELECT COUNT(*) FROM inventory_type");
+            PreparedStatement countStmt = conn.prepareStatement("SELECT COUNT(*) FROM inventory_type where is_deleted = 0");
             ResultSet countRs = countStmt.executeQuery();
             if (countRs.next()) {
                 totalCount = countRs.getInt(1);
@@ -74,7 +76,7 @@ public class InventoryDao {
             countStmt.close();
 
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type LIMIT ? OFFSET ?");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type LIMIT ? OFFSET ? where is_deleted = 0");
             ps.setInt(1, limit);
             ps.setInt(2, offset);
             ResultSet rs = ps.executeQuery();
@@ -102,7 +104,7 @@ public class InventoryDao {
         InventoryTypeResponse data = null;
 
         Connection conn = DBConnection.getInstance().getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type WHERE id = ?");
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory WHERE id = ?");
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
 
@@ -158,7 +160,6 @@ public class InventoryDao {
         }
     }
 
-
     public List<InventoryTypeResponse> getAllInventoryType() throws SQLException {
         List<InventoryTypeResponse> inventoryTypes = new ArrayList<>();
         try {
@@ -178,60 +179,157 @@ public class InventoryDao {
         return inventoryTypes;
     }
 
+
+    /***************************************************************************************************/
     /** Inventory Business Process */
-    public CommonResponse<String> createInventory111(InventoryRequest inventoryRequest) throws SQLException {
-        Connection conn = DBConnection.getInstance().getConnection();
+//    public CommonResponse<String> createInventory111(InventoryRequest inventoryRequest) throws SQLException {
+//        Connection conn = DBConnection.getInstance().getConnection();
+//        try {
+//            // Insert into inventory
+//            String invSql = "INSERT INTO inventory (barcode,name, default_image, inventory_type, author_id, isbn_no) VALUES (?, ?, ?, ?, ?, ?)";
+//
+//            PreparedStatement invStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
+//            invStmt.setString(1, inventoryRequest.getBarcode());
+//            invStmt.setString(2, inventoryRequest.getName());
+//            invStmt.setString(3, inventoryRequest.getDefaultImage());
+//            invStmt.setInt(4, inventoryRequest.getInventoryTypeId());
+//            invStmt.setInt(5, 1);
+//            invStmt.setString(6, inventoryRequest.getIsbnNo());
+//
+//            int invRows = invStmt.executeUpdate();
+//            if (invRows == 0) {
+//                throw new SQLException("Creating inventory failed, no rows affected.");
+//            }
+//
+//            int inventoryId;
+//            try (ResultSet generatedKeys = invStmt.getGeneratedKeys()) {
+//                if (generatedKeys.next()) {
+//                    inventoryId = generatedKeys.getInt(1);
+//                } else {
+//                    throw new SQLException("Creating inventory failed, no ID obtained.");
+//                }
+//            }
+//
+//            // Add price_list
+//            String priceSql = "INSERT INTO price_list (retail_price, cost_price, qty_hand, inventory_id)  VALUES (?, ?, ?, ?)";
+//            PreparedStatement priceStmt = conn.prepareStatement(priceSql);
+//            priceStmt.setDouble(1, inventoryRequest.getRetailPrice());
+//            priceStmt.setDouble(2, inventoryRequest.getCostPrice());
+//            priceStmt.setInt(3, inventoryRequest.getQtyHand());
+//            priceStmt.setInt(4, inventoryId);
+//
+//            priceStmt.executeUpdate();
+//            conn.commit();
+//            return new CommonResponse<>(200, "Product created successfully", null);
+//
+//        } catch (SQLException e) {
+//            conn.rollback();
+//            return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
+//        } finally {
+//            conn.setAutoCommit(true);
+//        }
+//    }
+
+    public List<InventoryResponse> getAllInventory() throws SQLException {
+        List<InventoryResponse> inventory = new ArrayList<>();
         try {
-            // Insert into inventory
-            String invSql = "INSERT INTO inventory (barcode,name, default_image, inventory_type, author_id, isbn_no) VALUES (?, ?, ?, ?, ?, ?)";
-
-            PreparedStatement invStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
-            invStmt.setString(1, inventoryRequest.getBarcode());
-            invStmt.setString(2, inventoryRequest.getName());
-            invStmt.setString(3, inventoryRequest.getDefaultImage());
-            invStmt.setInt(4, inventoryRequest.getInventoryType());
-            invStmt.setInt(5, 1);
-            invStmt.setString(6, inventoryRequest.getIsbnNo());
-
-            int invRows = invStmt.executeUpdate();
-            if (invRows == 0) {
-                throw new SQLException("Creating inventory failed, no rows affected.");
+            Connection conn = DBConnection.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("SELECT i.id, i.barcode, i.default_image, i.inventory_type,i.name, \n" +
+                    "it.name as inventory_type_name, i.author_id, a.first_name,\n" +
+                    "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand  FROM inventory i\n" +
+                    "left join inventory_type it ON i.inventory_type = it.id \n" +
+                    "left join author a on i.author_id = a.id\n" +
+                    "left join price_list pl on pl.inventory_id = i.id \n" +
+                    "where i.is_deleted = 0");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                InventoryResponse mappedData = InventoryMapper.inventoryResponse(rs);
+                inventory.add(mappedData);
             }
+            rs.close();
+            rs.close();
 
-            int inventoryId;
-            try (ResultSet generatedKeys = invStmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    inventoryId = generatedKeys.getInt(1);
-                } else {
-                    throw new SQLException("Creating inventory failed, no ID obtained.");
-                }
-            }
-
-            // Add price_list
-            String priceSql = "INSERT INTO price_list (retail_price, cost_price, qty_hand, inventory_id)  VALUES (?, ?, ?, ?)";
-            PreparedStatement priceStmt = conn.prepareStatement(priceSql);
-            priceStmt.setDouble(1, inventoryRequest.getRetailPrice());
-            priceStmt.setDouble(2, inventoryRequest.getCostPrice());
-            priceStmt.setInt(3, inventoryRequest.getQtyHand());
-            priceStmt.setInt(4, inventoryId);
-
-            priceStmt.executeUpdate();
-            conn.commit();
-            return new CommonResponse<>(200, "Product created successfully", null);
-
-        } catch (SQLException e) {
-            conn.rollback();
-            return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
-        } finally {
-            conn.setAutoCommit(true);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return inventory;
     }
 
+    public CommonResponse<InventoryResponse> getInventoryById(int id) throws SQLException {
+        int statusCode = 0;
+        String message = "";
+        InventoryResponse data = null;
+
+        Connection conn = DBConnection.getInstance().getConnection();
+        PreparedStatement ps = conn.prepareStatement("SELECT i.id, i.barcode, i.default_image, " +
+                "i.inventory_type as inventory_type_id, it.name as inventory_type,i.name, \n" +
+                "it.name as inventory_type_name, i.author_id, a.first_name,\n" +
+                "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand, i.is_deleted  FROM inventory i\n" +
+                "left join inventory_type it ON i.inventory_type = it.id \n" +
+                "left join author a on i.author_id = a.id\n" +
+                "left join price_list pl on pl.inventory_id = i.id \n" +
+                " WHERE i.is_deleted = 0 and i.id = ?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            data = InventoryMapper.inventoryResponse(rs);
+        }
+
+        return new CommonResponse<>(statusCode, message, data);
+    }
+
+    public CommonResponse<List<InventoryResponse>> getAllInventoryPaginate(int limit, int offset) throws SQLException {
+        int statusCode = 0;
+        String message = "";
+        int totalCount = 0;
+        List<InventoryResponse> data = null;
+        List<InventoryResponse> inventoryList = new ArrayList<>();
+
+        try {
+            Connection conn = DBConnection.getInstance().getConnection();
+            PreparedStatement countStmt = conn.prepareStatement("SELECT COUNT(*) FROM inventory where is_deleted = 0");
+            ResultSet countRs = countStmt.executeQuery();
+            if (countRs.next()) {
+                totalCount = countRs.getInt(1);
+            }
+            countRs.close();
+            countStmt.close();
+
+
+            PreparedStatement ps = conn.prepareStatement("SELECT i.id, i.barcode, i.default_image, " +
+                    "i.inventory_type as inventory_type_id, it.name as inventory_type,i.name, \n" +
+                    "it.name as inventory_type_name, i.author_id, a.first_name,\n" +
+                    "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand, i.is_deleted  FROM inventory i\n" +
+                    "left join inventory_type it ON i.inventory_type = it.id \n" +
+                    "left join author a on i.author_id = a.id\n" +
+                    "left join price_list pl on pl.inventory_id = i.id \n" +
+                    " WHERE i.is_deleted = 0 LIMIT ? OFFSET ?");
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                InventoryResponse  mappedData = InventoryMapper.inventoryResponse(rs);
+                inventoryList.add(mappedData);
+            }
+
+            statusCode = HttpStatusEnum.OK.getCode();
+            message = "Inventory type created successfully";
+            data = inventoryList;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusCode = HttpStatusEnum.INTERNAL_SERVER_ERROR.getCode();
+            message = "An error occurred while creating inventory type.";
+        }
+
+        return new CommonResponse<>(statusCode, message, data, totalCount);
+    }
 
     public CommonResponse<String> createInventory(InventoryRequest inventoryRequest) throws SQLException {
         Connection conn = DBConnection.getInstance().getConnection();
         try {
-            conn.setAutoCommit(false); // 🔥 REQUIRED to enable rollback
+            conn.setAutoCommit(false);
 
             // Insert into inventory
             String invSql = "INSERT INTO inventory (barcode,name, default_image, inventory_type, author_id, isbn_no) VALUES (?, ?, ?, ?, ?, ?)";
@@ -239,8 +337,8 @@ public class InventoryDao {
             invStmt.setString(1, inventoryRequest.getBarcode());
             invStmt.setString(2, inventoryRequest.getName());
             invStmt.setString(3, inventoryRequest.getDefaultImage());
-            invStmt.setInt(4, inventoryRequest.getInventoryType());
-            invStmt.setInt(5, inventoryRequest.getAuthorId()); // Consider using inventoryRequest.getAuthorId() instead of hardcoded 1
+            invStmt.setInt(4, inventoryRequest.getInventoryTypeId());
+            invStmt.setInt(5, inventoryRequest.getAuthorId());
             invStmt.setString(6, inventoryRequest.getIsbnNo());
 
             int invRows = invStmt.executeUpdate();

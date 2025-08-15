@@ -64,7 +64,7 @@
                                         InventoryTypeResponse item = inventoryTypes.get(i);
                             %>
                             <tr>
-                                <td><%= i + 1 %>
+                                <td><%= item.getId() %>
                                 </td>
                                 <td><%= item.getName() %>
                                 </td>
@@ -108,7 +108,6 @@
                                 </li>
                             </ul>
                         </nav>
-
                     </div>
                 </div>
             </div>

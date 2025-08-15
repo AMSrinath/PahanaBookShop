@@ -2,6 +2,7 @@ package pahana.education.controller.author;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "authorServlet", value = "/author")
+@MultipartConfig
 public class AuthorServlet extends HttpServlet {
     private static final String UPLOAD_DIR = "/src/assets/images/uploads";
 

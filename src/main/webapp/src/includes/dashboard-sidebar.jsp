@@ -22,7 +22,7 @@
                     </li>
                     <li>
 <%--                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>--%>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/src/pages/product-list.jsp" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>
                     </li>
                     <li><a class="nav-link" href="../pages/product-price-list.jsp" data-view="products"><i class="fas fa-box me-2"></i>Product Price</a>
                     </li>

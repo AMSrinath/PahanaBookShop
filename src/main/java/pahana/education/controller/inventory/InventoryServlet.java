@@ -13,12 +13,14 @@ import pahana.education.dao.InventoryDao;
 import pahana.education.model.request.InventoryRequest;
 import pahana.education.model.response.AuthorDataResponse;
 import pahana.education.model.response.CommonResponse;
+import pahana.education.model.response.InventoryResponse;
 import pahana.education.model.response.InventoryTypeResponse;
 import pahana.education.util.CommonUtil;
 import pahana.education.util.FileUploads;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,19 +37,32 @@ public class InventoryServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String idParam = request.getParameter("id");
-        CommonResponse<List<InventoryTypeResponse>> inventoryTypes = null;
+        String action = request.getParameter("action");
+        CommonResponse<List<InventoryResponse>> inventoryList = null;
 
         if (idParam != null && !idParam.isEmpty()) {
             try {
                 int id = Integer.parseInt(idParam);
-                CommonResponse<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getInventoryTypeById(id);
+                CommonResponse<InventoryResponse> inventoryType = InventoryDao.getInstance().getInventoryById(id);
                 if (inventoryType.getData() != null) {
-                    request.setAttribute("inventoryType", inventoryType.getData());
-                    request.getRequestDispatcher("/src/pages/inventory-form.jsp").forward(request, response);
+                    request.setAttribute("inventory", inventoryType.getData());
+                    request.getRequestDispatcher("/src/pages/product-form.jsp").forward(request, response);
                 } else {
                     request.setAttribute("errorMessage", "Inventory type not found");
-                    request.getRequestDispatcher("/src/pages/inventory-list.jsp").forward(request, response);
+                    request.getRequestDispatcher("/src/pages/product-list.jsp").forward(request, response);
                 }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if ("ADD-NEW".equalsIgnoreCase(action)) {
+            try {
+                List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
+                List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
+                request.setAttribute("inventoryTypes", inventoryType);
+                request.setAttribute("authorList", authorDataResponses);
+                request.getRequestDispatcher("/src/pages/product-form.jsp").forward(request, response);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -66,14 +81,21 @@ public class InventoryServlet extends HttpServlet {
 
             int offset = (page - 1) * pageSize;
             try {
-                List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
-                List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
-                request.setAttribute("inventoryTypes", inventoryType);
-                request.setAttribute("authorList", authorDataResponses);
-                request.getRequestDispatcher("/src/pages/product-form.jsp").forward(request, response);
-            } catch (Exception e) {
+                inventoryList = InventoryDao.getInstance().getAllInventoryPaginate(pageSize, offset);
+
+                int totalRecords = inventoryList.getTotalCount();
+                int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+                request.setAttribute("inventoryList", inventoryList.getData());
+                request.setAttribute("currentPage", page);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("pageSize", pageSize);
+                request.setAttribute("totalRecords", totalRecords);
+
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            request.getRequestDispatcher("/src/pages/product-list.jsp").forward(request, response);
         }
     }
 
@@ -127,7 +149,7 @@ public class InventoryServlet extends HttpServlet {
             // Create request object
             InventoryRequest invRequest = new InventoryRequest();
             invRequest.setBarcode(barcode);
-            invRequest.setInventoryType(inventoryTypeId);
+            invRequest.setInventoryTypeId(inventoryTypeId);
             invRequest.setAuthorId(authorId);
             invRequest.setIsbnNo(isbnNo);
             invRequest.setRetailPrice(retailPrice);
