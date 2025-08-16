@@ -10,6 +10,8 @@ import pahana.education.dao.InventoryDao;
 import pahana.education.model.request.InventoryTypeRequest;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.InventoryTypeResponse;
+import pahana.education.util.CommonResponseUtil;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -79,47 +81,38 @@ public class InventoryTypeServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HashMap<String, String> errors = new HashMap<>();
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
         String id = request.getParameter("id");
+        String action = request.getParameter("action");
         String productTypeName = request.getParameter("productTypeName");
 
         InventoryTypeRequest inventoryTypeRequest = new InventoryTypeRequest();
         inventoryTypeRequest.setName(productTypeName);
 
-        try {
-            CommonResponse<String> inventoryType;
-            if (id != null && !id.isEmpty()) {
-                int typeId = Integer.parseInt(id);
-                inventoryTypeRequest.setId(typeId);
-                inventoryType = InventoryDao.getInstance().updateInventoryType(inventoryTypeRequest);
-            } else {
-                inventoryType = InventoryDao.getInstance().createInventoryType(inventoryTypeRequest);
+        if ("DELETE".equalsIgnoreCase(action)) {
+            doDelete(request, response);
+        } else {
+            try {
+                CommonResponse<String> inventoryType;
+                if (id != null && !id.isEmpty()) {
+                    int typeId = Integer.parseInt(id);
+                    inventoryTypeRequest.setId(typeId);
+                    inventoryType = InventoryDao.getInstance().updateInventoryType(inventoryTypeRequest);
+                } else {
+                    inventoryType = InventoryDao.getInstance().createInventoryType(inventoryTypeRequest);
+                }
+
+                String jsonResponse = CommonResponseUtil.getJsonResponse(inventoryType);
+                out.write(jsonResponse);
+                out.flush();
+                out.close();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-
-            String jsonResponse = getJsonResponse(inventoryType);
-            out.write(jsonResponse);
-            out.flush();
-            
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
-    }
-
-    private static String getJsonResponse(CommonResponse<String> inventoryType) {
-        String jsonResponse = "";
-        if (inventoryType.getCode() == 400 || inventoryType.getCode() == 500) {
-            jsonResponse = String.format("{\"code\": %d, \"message\": \"%s\"}",
-                    inventoryType.getCode(),
-                    inventoryType.getMessage().replace("\"", "\\\"")); // escape quotes
-        }  else {
-            jsonResponse = String.format("{\"code\": %d, \"message\": \"%s\"}",
-                    inventoryType.getCode(),
-                    inventoryType.getMessage().replace("\"", "\\\"")); // escape quotes
-        }
-        return jsonResponse;
     }
 
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

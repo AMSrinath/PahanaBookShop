@@ -6,17 +6,18 @@ public class InventoryRequest {
     private String name;
     private String defaultImage;
     private int inventoryTypeId;
-    private int authorId;
+    private Integer authorId;
     private String isbnNo;
     private double retailPrice;
     private double costPrice;
-    private Integer qtyHand;
+    private int qtyHand;
+    private int priceListId;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -90,5 +91,13 @@ public class InventoryRequest {
 
     public void setQtyHand(Integer qtyHand) {
         this.qtyHand = qtyHand;
+    }
+
+    public int getPriceListId() {
+        return priceListId;
+    }
+
+    public void setPriceListId(int priceListId) {
+        this.priceListId = priceListId;
     }
 }

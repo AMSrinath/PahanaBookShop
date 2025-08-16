@@ -76,7 +76,7 @@ public class InventoryDao {
             countStmt.close();
 
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type LIMIT ? OFFSET ? where is_deleted = 0");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type where is_deleted = 0 LIMIT ? OFFSET ? ");
             ps.setInt(1, limit);
             ps.setInt(2, offset);
             ResultSet rs = ps.executeQuery();
@@ -104,7 +104,7 @@ public class InventoryDao {
         InventoryTypeResponse data = null;
 
         Connection conn = DBConnection.getInstance().getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory WHERE id = ?");
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM inventory_type WHERE id = ?");
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
 
@@ -138,7 +138,6 @@ public class InventoryDao {
     public CommonResponse<String> deleteInventoryType(int id) throws SQLException {
 
         try{
-//            String sql = "DELETE FROM inventory_type WHERE id = ?";
             String sql = "UPDATE inventory_type SET is_deleted = 1 WHERE id = ?";
             Connection conn = DBConnection.getInstance().getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -264,7 +263,7 @@ public class InventoryDao {
         PreparedStatement ps = conn.prepareStatement("SELECT i.id, i.barcode, i.default_image, " +
                 "i.inventory_type as inventory_type_id, it.name as inventory_type,i.name, \n" +
                 "it.name as inventory_type_name, i.author_id, a.first_name,\n" +
-                "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand, i.is_deleted  FROM inventory i\n" +
+                "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand, i.is_deleted, pl.id as price_list_id  FROM inventory i\n" +
                 "left join inventory_type it ON i.inventory_type = it.id \n" +
                 "left join author a on i.author_id = a.id\n" +
                 "left join price_list pl on pl.inventory_id = i.id \n" +
@@ -300,7 +299,7 @@ public class InventoryDao {
             PreparedStatement ps = conn.prepareStatement("SELECT i.id, i.barcode, i.default_image, " +
                     "i.inventory_type as inventory_type_id, it.name as inventory_type,i.name, \n" +
                     "it.name as inventory_type_name, i.author_id, a.first_name,\n" +
-                    "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand, i.is_deleted  FROM inventory i\n" +
+                    "a.last_name, i.isbn_no, pl.cost_price, pl.retail_price, pl.qty_hand, i.is_deleted,pl.id as price_list_id   FROM inventory i\n" +
                     "left join inventory_type it ON i.inventory_type = it.id \n" +
                     "left join author a on i.author_id = a.id\n" +
                     "left join price_list pl on pl.inventory_id = i.id \n" +
@@ -338,7 +337,12 @@ public class InventoryDao {
             invStmt.setString(2, inventoryRequest.getName());
             invStmt.setString(3, inventoryRequest.getDefaultImage());
             invStmt.setInt(4, inventoryRequest.getInventoryTypeId());
-            invStmt.setInt(5, inventoryRequest.getAuthorId());
+
+            if (inventoryRequest.getAuthorId() != null) {
+                invStmt.setInt(5, inventoryRequest.getAuthorId());
+            } else {
+                invStmt.setNull(5, Types.INTEGER);
+            }
             invStmt.setString(6, inventoryRequest.getIsbnNo());
 
             int invRows = invStmt.executeUpdate();
@@ -370,12 +374,80 @@ public class InventoryDao {
             return new CommonResponse<>(200, "Product created successfully", null);
 
         } catch (SQLException e) {
+            try {
+                conn.rollback(); // rollback only works if auto-commit is false
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
+        } finally {
             if (conn != null) {
                 try {
-                    conn.rollback(); // rollback only works if auto-commit is false
-                } catch (SQLException rollbackEx) {
-                    rollbackEx.printStackTrace();
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    public CommonResponse<String> deleteInventory(int id) throws SQLException {
+
+        try{
+            String sql = "UPDATE inventory SET is_deleted = 1 WHERE id = ?";
+            Connection conn = DBConnection.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, id);
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                return new CommonResponse<>(200, "Inventory deleted successfully", null);
+            } else {
+                return new CommonResponse<>(404, "Inventory not found", null);
+            }
+        } catch (SQLException e) {
+            return new CommonResponse<>(
+                    500,
+                    "Database error: " + e.getMessage(),
+                    null
+            );
+        }
+    }
+
+    public CommonResponse<String> updateInventory(InventoryRequest request) throws SQLException, ServletException {
+        Connection conn = DBConnection.getInstance().getConnection();
+
+        try{
+            conn.setAutoCommit(false);
+            String sql = "UPDATE inventory SET barcode = ?, name = ?, default_image = ?, inventory_type = ?, author_id = ?, isbn_no = ? WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, request.getBarcode());
+            ps.setString(2, request.getName());
+            ps.setString(3, request.getDefaultImage());
+            ps.setInt(4, request.getInventoryTypeId());
+            ps.setInt(5, request.getAuthorId());
+            ps.setString(6, request.getIsbnNo());
+            ps.setInt(7, request.getId());
+            ps.executeUpdate();
+
+            String priceSql = "UPDATE price_list SET retail_price = ? , cost_price = ?, qty_hand= ? WHERE id = ?";
+            PreparedStatement priceStmt = conn.prepareStatement(priceSql);
+            priceStmt.setDouble(1, request.getRetailPrice());
+            priceStmt.setDouble(2, request.getCostPrice());
+            priceStmt.setInt(3, request.getQtyHand());
+            priceStmt.setInt(4, request.getPriceListId());
+            priceStmt.executeUpdate();
+
+            conn.commit();
+            return new CommonResponse<>(200, "Product created successfully", null);
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // rollback only works if auto-commit is false
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
             }
             return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
         } finally {

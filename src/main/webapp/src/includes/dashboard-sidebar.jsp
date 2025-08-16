@@ -18,13 +18,10 @@
             <div class="collapse" id="salesMenu">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory-type" data-view="artwork"><i class="fas fa-paint-brush me-2"></i>Product types</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory-type"><i class="fas fa-paint-brush me-2"></i>Product types</a>
                     </li>
                     <li>
-<%--                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>--%>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory" data-view="editions"><i class="fas fa-copy me-2"></i>Products</a>
-                    </li>
-                    <li><a class="nav-link" href="../pages/product-price-list.jsp" data-view="products"><i class="fas fa-box me-2"></i>Product Price</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory"><i class="fas fa-copy me-2"></i>Products</a>
                     </li>
                 </ul>
             </div>

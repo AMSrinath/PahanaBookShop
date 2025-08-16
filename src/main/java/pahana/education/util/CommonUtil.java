@@ -10,7 +10,7 @@ public class CommonUtil {
         }
     }
 
-    public static int checkIntValue(String value, int defaultValue) {
+    public static Integer checkIntValue(String value, int defaultValue) {
         try {
             return (value != null && !value.trim().isEmpty()) ? Integer.parseInt(value) : defaultValue;
         } catch (NumberFormatException e) {

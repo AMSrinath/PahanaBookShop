@@ -88,7 +88,7 @@
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    if (response.code == 200) {
+                    if (response.code === 200) {
                         showToast(response.message, "success");
                         setTimeout(() => {
                             window.location.href = "<%= request.getContextPath() %>/inventory-type";
@@ -103,12 +103,6 @@
             });
         });
     });
-
-    // document.getElementById("save-btn").addEventListener("click", function () {
-    //     console.log('Save button clicked');
-    //     document.getElementById("inventory-type-form").submit();
-    // });
-
 
     function showToast(message, type) {
         const toastEl = document.getElementById('errorToast');

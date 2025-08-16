@@ -22,7 +22,8 @@ public class InventoryMapper {
                 resultSet.getString("isbn_no"),
                 resultSet.getDouble("retail_price"),
                 resultSet.getDouble("cost_price"),
-                resultSet.getInt("qty_hand")
+                resultSet.getInt("qty_hand"),
+                resultSet.getInt("price_list_id")
         );
     }
 }

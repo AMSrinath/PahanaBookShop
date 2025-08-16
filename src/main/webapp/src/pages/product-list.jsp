@@ -23,9 +23,8 @@
         <div class="container-fluid">
             <div class="action-header">
                 <h2 class="page-title"></h2>
-                <button id="add-customer-btn" class="btn btn-primary"
-                        onclick="location.href='${pageContext.request.contextPath}/inventory?action=ADD-NEW'">
-                    <a href="">
+                <button id="add-customer-btn" class="btn btn-primary" >
+                    <a href="${pageContext.request.contextPath}/inventory?action=ADD-NEW">
                         <i class="fas fa-plus me-2"></i>Add New Product
                     </a>
                 </button>
@@ -71,7 +70,7 @@
                                 </td>
                                 <td class="action-buttons">
                                     <button class="btn btn-sm btn-primary edit-btn" data-id="C1002"
-                                            onclick="location.href='${pageContext.request.contextPath}/inventory-type?id=<%= item.getId() %>'">
+                                            onclick="location.href='${pageContext.request.contextPath}/inventory?id=<%= item.getId() %>'">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn btn-sm btn-danger delete-btn" data-id="<%= item.getId() %>">
@@ -114,38 +113,65 @@
 
 </div>
 
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this product type?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    let deleteId = null;
-    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    document.addEventListener('DOMContentLoaded', function () {
+        let deleteId = null;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
 
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            deleteId = this.getAttribute('data-id');
-            deleteModal.show();
-        });
-    });
-
-    // Confirm delete action
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        if (!deleteId) return;
-
-        fetch(`<%= request.getContextPath() %>/inventory-type?id=\${deleteId}`, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    response.text().then(text => {
-                        alert(`Delete failed: \${text}`);
-                        deleteModal.hide();
-                    });
-                }
-            })
-            .catch(error => {
-                alert('Network error: ' + error.message);
-                deleteModal.hide();
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                deleteId = this.getAttribute('data-id');
+                deleteModal.show();
             });
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            console.log("Confirm delete button clicked", deleteId);
+            if (!deleteId) return;
+            const params = new URLSearchParams();
+            params.append('id', deleteId);
+            params.append('action', 'DELETE');
+
+            fetch(`<%= request.getContextPath() %>/inventory-type`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString()
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        response.text().then(text => {
+                            alert(`Delete failed: ${text}`);
+                            deleteModal.hide();
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert('Network error: ' + error.message);
+                    deleteModal.hide();
+                });
+        });
     });
 </script>
 

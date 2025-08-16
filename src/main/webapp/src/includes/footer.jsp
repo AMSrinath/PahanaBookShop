@@ -53,17 +53,17 @@
     // });
 
     // Delete button handling
-    document.querySelectorAll('.btn-danger').forEach(button => {
-        button.addEventListener('click', function () {
-            const row = this.closest('tr');
-            const customerName = row.querySelector('td:nth-child(2)').textContent;
+    <%--document.querySelectorAll('.btn-danger').forEach(button => {--%>
+    <%--    button.addEventListener('click', function () {--%>
+    <%--        const row = this.closest('tr');--%>
+    <%--        const customerName = row.querySelector('td:nth-child(2)').textContent;--%>
 
-            if (confirm(`Are you sure you want to delete ${customerName}?`)) {
-                row.remove();
-                alert('Customer deleted successfully!');
-            }
-        });
-    });
+    <%--        if (confirm(`Are you sure you want to delete ${customerName}?`)) {--%>
+    <%--            row.remove();--%>
+    <%--            alert('Customer deleted successfully!');--%>
+    <%--        }--%>
+    <%--    });--%>
+    <%--});--%>
 
 
     // Customer form functionality

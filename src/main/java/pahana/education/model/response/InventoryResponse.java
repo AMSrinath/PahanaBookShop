@@ -11,13 +11,14 @@ public class InventoryResponse {
     private int authorId;
     private String author;
     private String isbnNo;
+    private int priceListId;
     private double retailPrice;
     private double costPrice;
     private Integer qtyHand;
 
     public InventoryResponse(int id, String barcode, String name, Boolean isActive, String defaultImage,
                              int inventoryTypeId, String inventoryType, int authorId, String author, String isbnNo,
-                             double retailPrice, double costPrice, Integer qtyHand) {
+                             double retailPrice, double costPrice, int qtyHand, int priceListId) {
         this.id = id;
         this.barcode = barcode;
         this.name = name;
@@ -31,6 +32,7 @@ public class InventoryResponse {
         this.retailPrice = retailPrice;
         this.costPrice = costPrice;
         this.qtyHand = qtyHand;
+        this.priceListId= priceListId;
     }
 
     public int getId() {
@@ -135,5 +137,13 @@ public class InventoryResponse {
 
     public void setQtyHand(Integer qtyHand) {
         this.qtyHand = qtyHand;
+    }
+
+    public int getPriceListId() {
+        return priceListId;
+    }
+
+    public void setPriceListId(int priceListId) {
+        this.priceListId = priceListId;
     }
 }

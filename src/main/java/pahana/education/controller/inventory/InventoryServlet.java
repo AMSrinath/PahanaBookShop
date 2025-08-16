@@ -8,19 +8,24 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import org.json.JSONObject;
 import pahana.education.dao.AuthorDao;
 import pahana.education.dao.InventoryDao;
 import pahana.education.model.request.InventoryRequest;
+import pahana.education.model.request.InventoryTypeRequest;
 import pahana.education.model.response.AuthorDataResponse;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.InventoryResponse;
 import pahana.education.model.response.InventoryTypeResponse;
+import pahana.education.util.CommonResponseUtil;
 import pahana.education.util.CommonUtil;
 import pahana.education.util.FileUploads;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,14 +47,21 @@ public class InventoryServlet extends HttpServlet {
 
         if (idParam != null && !idParam.isEmpty()) {
             try {
+                List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
+                List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
+
                 int id = Integer.parseInt(idParam);
-                CommonResponse<InventoryResponse> inventoryType = InventoryDao.getInstance().getInventoryById(id);
-                if (inventoryType.getData() != null) {
-                    request.setAttribute("inventory", inventoryType.getData());
+                CommonResponse<InventoryResponse> inventory = InventoryDao.getInstance().getInventoryById(id);
+                if (inventory.getData() != null) {
+                    request.setAttribute("inventoryTypes", inventoryType);
+                    request.setAttribute("authorList", authorDataResponses);
+                    request.setAttribute("inventoriesData", inventory.getData());
                     request.getRequestDispatcher("/src/pages/product-form.jsp").forward(request, response);
+                    return;
                 } else {
                     request.setAttribute("errorMessage", "Inventory type not found");
                     request.getRequestDispatcher("/src/pages/product-list.jsp").forward(request, response);
+                    return;
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -100,12 +112,90 @@ public class InventoryServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HashMap<String, String> errors = new HashMap<>();
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        StringBuilder jsonBuffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonBuffer.append(line);
+        }
+
+        String action = request.getParameter("action");
+        JSONObject json = new JSONObject(jsonBuffer.toString());
+
+        String productImagePath = "";
+        String productId = json.getString("productId");
+        String priceListId = json.getString("priceListId");
+        String barcode = json.getString("barcode");
+        String itemName = json.getString("itemName");
+        String inventoryTypeId = json.getString("inventoryTypeId");
+        String author = json.getString("authorId") == "" ? null : json.getString("authorId");
+        String isbnNo = json.getString("isbnNo");
+        String retailPrice = json.getString("retailPrice");
+        String costPrice = json.getString("costPrice");
+        String qtyHand = json.getString("qtyHand");
+        String base64DataUrl = json.getString("productImage");
+
+        if (!base64DataUrl.equals("") && base64DataUrl != null || !base64DataUrl.isEmpty()) {
+            String base64Image = base64DataUrl.split(",")[1]; // remove data:image/... prefix
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            productImagePath= FileUploads.handleImageUpload(request, imageBytes, UPLOAD_DIR);
+        }
+
+
+        Integer authorId = null;
+        if (author != null && !JSONObject.NULL.equals(author)) {
+            authorId = Integer.valueOf(author);
+        }
+
+
+        InventoryRequest invRequest = new InventoryRequest();
+        invRequest.setName(itemName);
+        invRequest.setBarcode(barcode);
+        invRequest.setInventoryTypeId(CommonUtil.checkIntValue(inventoryTypeId, 0));
+        invRequest.setAuthorId(authorId);
+        invRequest.setIsbnNo(isbnNo);
+        invRequest.setRetailPrice(CommonUtil.checkDoubleValue(retailPrice, 0));
+        invRequest.setCostPrice(CommonUtil.checkDoubleValue(costPrice, 0));
+        invRequest.setQtyHand(CommonUtil.checkIntValue(qtyHand, 0));
+        invRequest.setDefaultImage(productImagePath);
+
+
+        if ("DELETE".equalsIgnoreCase(action)) {
+            doDelete(request, response);
+        } else {
+            try {
+                CommonResponse<String> inventoryData;
+                if (productId != null && !productId.isEmpty()) {
+                    int id = Integer.parseInt(productId);
+                    int priceId = Integer.parseInt(priceListId);
+                    invRequest.setId(id);
+                    invRequest.setPriceListId(priceId);
+                    inventoryData = InventoryDao.getInstance().updateInventory(invRequest);
+                } else {
+                    inventoryData = InventoryDao.getInstance().createInventory(invRequest);
+                }
+
+                String jsonResponse = CommonResponseUtil.getJsonResponse(inventoryData);
+                out.write(jsonResponse);
+                out.flush();
+                out.close();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         ObjectMapper mapper = new ObjectMapper();
 
         try {
+            String id = request.getParameter("id");
             String barcode = request.getParameter("barcode");
             String itemName = request.getParameter("itemName");
             int inventoryTypeId = CommonUtil.checkIntValue(request.getParameter("inventoryTypeId"), 0);
@@ -115,39 +205,18 @@ public class InventoryServlet extends HttpServlet {
             double costPrice =  CommonUtil.checkDoubleValue(request.getParameter("costPrice"),0);
             int qtyHand =  CommonUtil.checkIntValue(request.getParameter("qtyHand"), 0);
 
-            // Handle file upload
             String imagePath = null;
             Part filePart = request.getPart("imageFile");
             if (filePart != null && filePart.getSize() > 0) {
                 imagePath = FileUploads.handleFileUpload(request, filePart, UPLOAD_DIR);
             }
 
-
             boolean isBarcodeExist = InventoryDao.getInstance().isBarcodeExists(barcode);
-
             boolean isbnNoExists = InventoryDao.getInstance().isIsbnNoExists(barcode);
-
             CommonResponse<InventoryTypeResponse> inventoryTypeByIdData = InventoryDao.getInstance().getInventoryTypeById(inventoryTypeId);
 
-            String inventoryTypes = inventoryTypeByIdData.getData().getName().toUpperCase();
-
-
-            if (barcode == null || barcode.trim().isEmpty()) {
-                errors.put("barcode", "Barcode is required");
-            } else if (isBarcodeExist) {
-                errors.put("barcode", "Barcode already exists");
-            } else if(inventoryTypeId == 0 ) {
-                errors.put("inventoryType", "Inventory type is required");
-            }
-
-            if (!errors.isEmpty()) {
-                request.setAttribute("errors", errors);
-                request.getRequestDispatcher("product-form.jsp").forward(request, response);
-                return;
-            }
-
-            // Create request object
             InventoryRequest invRequest = new InventoryRequest();
+            invRequest.setId(Integer.parseInt(id));
             invRequest.setBarcode(barcode);
             invRequest.setInventoryTypeId(inventoryTypeId);
             invRequest.setAuthorId(authorId);
@@ -158,8 +227,7 @@ public class InventoryServlet extends HttpServlet {
             invRequest.setDefaultImage(imagePath);
             invRequest.setName(itemName);
 
-            CommonResponse<String> result = InventoryDao.getInstance().createInventory(invRequest);
-
+            CommonResponse<String> result = InventoryDao.getInstance().updateInventory(invRequest);
             out.print(mapper.writeValueAsString(result));
 
         } catch (Exception e) {
@@ -173,10 +241,28 @@ public class InventoryServlet extends HttpServlet {
         }
     }
 
-    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    }
-
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String productId = request.getParameter("id");
+        if (productId == null || productId.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID parameter");
+            return;
+        }
+
+        try {
+            int id = Integer.parseInt(productId);
+            CommonResponse<String> deleteResponse = InventoryDao.getInstance().deleteInventory(id);
+
+            if (deleteResponse.getCode() == 200) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(deleteResponse.getMessage());
+            } else {
+                response.sendError(deleteResponse.getCode(), deleteResponse.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Delete failed: " + e.getMessage());
+        }
     }
 
     public void destroy() {}

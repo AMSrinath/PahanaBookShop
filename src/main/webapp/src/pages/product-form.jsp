@@ -1,9 +1,21 @@
 <%@ page import="pahana.education.model.response.InventoryTypeResponse" %>
 <%@ page import="java.util.List" %>
 <%@ page import="pahana.education.model.response.AuthorDataResponse" %>
-<% String pageTitle = "Add Product"; %>
+<%@ page import="pahana.education.model.response.InventoryResponse" %>
 <%@ include file="../includes/header.jsp" %>
 <%@ include file="../includes/dashboard-sidebar.jsp" %>
+
+<%
+    String pageTitle = "Product";
+    String idParam = request.getParameter("id");
+    InventoryResponse inventory = (InventoryResponse) request.getAttribute("inventoriesData");
+
+    String baseUrl = request.getContextPath();
+    String imagePath = (inventory != null && inventory.getDefaultImage() != null && !inventory.getDefaultImage().isEmpty())
+            ? baseUrl + "/" + inventory.getDefaultImage()
+            : baseUrl + "/src/assets/images/uploads/default.jpg";
+%>
+
 
 <div class="main-content">
     <%@ include file="../includes/dashboard-header.jsp" %>
@@ -30,18 +42,22 @@
                     </div>
                 </div>
 
-                <form id="productForm" action=""  enctype="multipart/form-data">
+                <form id="productForm" method="post" enctype="multipart/form-data">
                     <div class="row">
-                        <input type="hidden" id="id" name="id" value="">
-
+                        <input type="hidden" name="productId" id="productId" value="<%= (inventory != null) ? inventory.getId() : "" %>">
+                        <input type="hidden" name="priceListId" id="priceListId" value="<%= (inventory != null) ? inventory.getPriceListId() : "" %>">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Barcode <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="barcode"  value="" required>
+                            <input type="text" class="form-control" name="barcode"
+                                   id="barcode"
+                                   value="<%= (inventory != null) ? inventory.getBarcode() : "" %>">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Item Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="itemName"  value="" required>
+                            <input type="text" class="form-control" name="itemName"
+                                   id="itemName"
+                                   value="<%= (inventory != null) ? inventory.getName() : "" %>">
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -52,8 +68,9 @@
                                     List<InventoryTypeResponse> inventoryTypes = (List<InventoryTypeResponse>) request.getAttribute("inventoryTypes");
                                     if (inventoryTypes != null) {
                                         for (InventoryTypeResponse type : inventoryTypes) {
+                                            boolean isSelected = (inventory != null && inventory.getInventoryTypeId() == type.getId());
                                 %>
-                                <option value="<%= type.getId() %>"><%= type.getName() %></option>
+                                <option id="inventoryTypeId" value="<%= type.getId() %>" <%= isSelected ? "selected" : "" %>><%= type.getName() %></option>
                                 <%
                                         }
                                     }
@@ -69,8 +86,9 @@
                                     List<AuthorDataResponse> authorList = (List<AuthorDataResponse>) request.getAttribute("authorList");
                                     if (authorList != null) {
                                         for (AuthorDataResponse auth : authorList) {
+                                            boolean isSelected = (inventory != null && inventory.getAuthorId() == auth.getId());
                                 %>
-                                <option value="<%= auth.getId() %>"><%= auth.getFullName() %></option>
+                                <option value="<%= auth.getId() %>"  <%= isSelected ? "selected" : "" %>  ><%= auth.getFullName() %></option>
                                 <%
                                         }
                                     }
@@ -80,41 +98,32 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">ISBN Number</label>
-                            <input type="text" class="form-control" name="isbnNo" value="">
+                            <input type="text" class="form-control" name="isbnNo" value="<%= (inventory != null) ? inventory.getIsbnNo() : "" %>">
                         </div>
 
                         <h4 class="mt-4 mb-3">Pricing & Stock</h4>
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Retail Price (Rs)</label>
-                            <input type="number" class="form-control" name="retailPrice" value="">
+                            <input type="number" class="form-control" name="retailPrice" value="<%= (inventory != null) ? inventory.getRetailPrice() : "" %>">
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Cost Price (Rs)</label>
-                            <input type="number" class="form-control" name="costPrice" value="">
+                            <input type="number" class="form-control" name="costPrice" value="<%= (inventory != null) ? inventory.getCostPrice() : "" %>">
                         </div>
 
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Quantity on Hand</label>
-                            <input type="number" class="form-control" name="qtyHand" value="">
+                            <input type="number" class="form-control" name="qtyHand" value="<%= (inventory != null) ? inventory.getQtyHand() : "" %>">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Product Image</label>
                             <div class="image-upload-container">
-                                <%-- Preview container --%>
-                                <%--                                <div class="image-preview-form mb-3" id="imagePreview">--%>
-                                <%--                                    <% if (inventory != null && inventory.getDefaultImage() != null && !inventory.getDefaultImage().isEmpty()) { %>--%>
-                                <%--                                    <img id="previewImage" src="<%= inventory.getDefaultImage() %>"--%>
-                                <%--                                         alt="Preview" style="max-width: 100%; max-height: 100%;"/>--%>
-                                <%--                                    <% } else { %>--%>
-                                <%--                                    <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>--%>
-                                <%--                                    <% } %>--%>
-                                <%--                                </div>--%>
-
                                 <div class="image-preview-form mb-3" id="imagePreview">
-                                    <img id="previewImage" src="${pageContext.request.contextPath}/src/assets/images/uploads/default.jpg"/>
+                                    <%--                                    <img id="previewImage" src="${pageContext.request.contextPath}/src/assets/images/uploads/default.jpg"/>--%>
+                                    <img id="previewImage" src="<%= imagePath %>" />
                                 </div>
 
                                 <div class="input-group mb-2">
@@ -123,14 +132,6 @@
                                     </button>
                                     <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" style="display: none;">
                                 </div>
-
-<%--                                    <div class="mt-2">--%>
-<%--                                        <button type="button" class="btn btn-sm btn-outline-danger" id="removeImageBtn"--%>
-<%--                                                style="">--%>
-<%--                                            &lt;%&ndash; style="<%= (inventory == null || inventory.getDefaultImage() == null || inventory.getDefaultImage().isEmpty()) ? "display: none;" : "" %>">&ndash;%&gt;--%>
-<%--                                            <i class="fas fa-trash me-1"></i> Remove Image--%>
-<%--                                        </button>--%>
-<%--                                    </div>--%>
                             </div>
                         </div>
                     </div>
@@ -140,152 +141,124 @@
     </div>
 </div>
 
-
 <script>
-    $(document).ready(function() {
-        const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
-
-        // Show validation error
-        function showError(message) {
-            $('#toastMessage').text(message);
-            errorToast.show();
+    $(document).ready(function () {
+        let base64ImageData = "";
+        const idParam = '<%= (idParam != null) ? idParam : "" %>';
+        console.log("ID Parameter: " + idParam);
+        if (idParam) {
+            $('#form-title').html('<i class="fas fa-edit me-2"></i>Update Product Type');
+            $('#save-btn').html('<i class="fas fa-save me-2"></i>Update');
         }
 
-        // Field validation
-        function validateField(selector, message) {
-            const $field = $(selector);
-            let isValid = true;
-
-            if ($field.prop('required')) {
-                if ($field.is('select') && $field.val() === '') {
-                    $field.addClass('is-invalid');
-                    showError(message);
-                    isValid = false;
-                } else if ($field.is('input') && !$field.val().trim()) {
-                    $field.addClass('is-invalid');
-                    showError(message);
-                    isValid = false;
-                }
-            }
-
-            // Special validation for author when novels selected
-            if (selector === '[name="authorId"]') {
-                const isNovel = $('[name="inventoryTypeId"] option:selected').text().toLowerCase().includes('novel');
-                if (isNovel && $field.val() === '') {
-                    $field.addClass('is-invalid');
-                    showError(message);
-                    isValid = false;
-                }
-            }
-
-            return isValid;
-        }
-
-        // Validate all fields
-        function validateForm() {
-            let isValid = true;
-
-            // Clear previous errors
-            $('.is-invalid').removeClass('is-invalid');
-
-            // Validate required fields
-            isValid &= validateField('[name="barcode"]', 'Please enter a barcode');
-            isValid &= validateField('[name="itemName"]', 'Please enter an item name');
-            isValid &= validateField('[name="inventoryTypeId"]', 'Please select an inventory type');
-            isValid &= validateField('[name="authorId"]', 'Please select an author for novels');
-
-            // Validate numeric fields
-            const numericFields = [
-                {selector: '[name="retailPrice"]', message: 'Retail price must be a positive number'},
-                {selector: '[name="costPrice"]', message: 'Cost price must be a positive number'},
-                {selector: '[name="qtyHand"]', message: 'Quantity must be a positive integer'}
-            ];
-
-            numericFields.forEach(field => {
-                const value = $(field.selector).val();
-                if (value && (isNaN(value) || parseFloat(value) <= 0)) {
-                    $(field.selector).addClass('is-invalid');
-                    showError(field.message);
-                    isValid = false;
-                }
-            });
-            return isValid;
-        }
-
-        $('input, select').on('input change', function() {
-            $(this).removeClass('is-invalid');
-        });
-
-
-        //save button
-        $("#save-btn").click(function() {
-            if (!validateForm()) return;
-
-            const formData = new FormData($("#productForm")[0]);
-            $.ajax({
-                url: "${pageContext.request.contextPath}/inventory",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if(response.code === 200) {
-                        alert(response.message);
-                    }
-                },
-                error: function(xhr) {
-                    alert("Request failed: " + xhr.statusText);
-                }
-            });
-        });
-
-        //clear button
-        $("#clear-btn").click(function() {
-            $("#productForm")[0].reset();
-            $("#previewImage").attr("src", "").hide();
-            $(".fa-image").show();
-        });
-
-        $("#imageFile").change(function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $("#previewImage").attr("src", e.target.result).show();
-                    $(".fa-image").hide();
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        $("#uploadTrigger").click(function() {
-            $("#imageFile").click();
-        });
-
-        $("#removeImageBtn").click(function() {
-            $("#imageFile").val("");
-            $("#previewImage").attr("src", "").hide();
-            $(".fa-image").show();
-        });
-
-///////////////////////////////////////////////////
-        function toggleAuthorField() {
-            const selectedText = $('[name="inventoryTypeId"] option:selected').text().toLowerCase();
-            const isNovel = selectedText.includes('novel'); // Case-insensitive check
-
-            $('[name="authorId"]').prop('disabled', !isNovel)
-                .closest('.mb-3').toggleClass('field-disabled', !isNovel);
-
-            if (!isNovel) $('[name="authorId"]').val('');
-        }
-
-        // Initialize and bind events
         toggleAuthorField();
         $('[name="inventoryTypeId"]').change(toggleAuthorField);
+
+        document.getElementById("imageFile").addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                base64ImageData = e.target.result;
+                document.getElementById("previewImage").src = base64ImageData;
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+
+        $("#save-btn").click(function() {
+            // const formData = new FormData($("#productForm")[0]);
+            const newFormData = {
+                productId: $('[name="productId"]').val(),
+                priceListId: $('[name="priceListId"]').val(),
+                barcode: $('[name="barcode"]').val(),
+                itemName: $('[name="itemName"]').val(),
+                inventoryTypeId: $('[name="inventoryTypeId"]').val(),
+                authorId: $('[name="authorId"]').val(),
+                isbnNo: $('[name="isbnNo"]').val(),
+                retailPrice: $('[name="retailPrice"]').val(),
+                costPrice: $('[name="costPrice"]').val(),
+                qtyHand: $('[name="qtyHand"]').val(),
+                productImage: base64ImageData,
+            };
+            $.ajax({
+                url: "<%= request.getContextPath() %>/inventory",
+                type: "POST",
+                data: JSON.stringify(newFormData),
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.code === 200) {
+                        showToast(response.message, "success");
+                        setTimeout(() => {
+                            window.location.href = "<%= request.getContextPath() %>/inventory";
+                        }, 2000);
+                    } else {
+                        showToast(response.message || "Something went wrong", "error");
+                    }
+                },
+                error: function (xhr) {
+                    showToast("Request failed: ","error");
+                }
+            });
+        });
+    });
+
+    function showToast(message, type) {
+        const toastEl = document.getElementById('errorToast');
+        const toastBody = document.getElementById('toastMessage');
+
+        toastBody.innerText = message;
+        toastEl.classList.remove('bg-success', 'bg-danger');
+        toastEl.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
+
+        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        toast.show();
+    }
+
+    $("#clear-btn").click(function() {
+        $("#productForm")[0].reset();
+        $("#previewImage").attr("src", "").hide();
+        $(".fa-image").show();
+    });
+
+    $("#imageFile").change(function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $("#previewImage").attr("src", e.target.result).show();
+                $(".fa-image").hide();
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    $("#uploadTrigger").click(function() {
+        $("#imageFile").click();
+    });
+
+    $("#removeImageBtn").click(function() {
+        $("#imageFile").val("");
+        $("#previewImage").attr("src", "").hide();
+        $(".fa-image").show();
     });
 
 
+    function toggleAuthorField() {
+        const selectedText = $('[name="inventoryTypeId"] option:selected').text().toLowerCase();
+        const isNovel = selectedText.includes('novel'); // Case-insensitive check
+
+        $('[name="authorId"]').prop('disabled', !isNovel)
+            .closest('.mb-3').toggleClass('field-disabled', !isNovel);
+
+        if (!isNovel) $('[name="authorId"]').val('');
+    }
+
 </script>
+
 
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
     <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
