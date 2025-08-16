@@ -5,7 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import pahana.education.model.response.user.UserDataResponse;
+import pahana.education.model.response.UserDataResponse;
 
 import java.security.Key;
 import java.util.Date;

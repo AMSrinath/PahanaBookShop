@@ -1,4 +1,4 @@
-package pahana.education.model.response.user;
+package pahana.education.model.response;
 
 public class UserRoleResponse {
     private int id;

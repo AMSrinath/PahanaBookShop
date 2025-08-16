@@ -1,4 +1,4 @@
-package pahana.education.model.response.inventory;
+package pahana.education.model.response;
 
 public class InventoryTypeResponse {
     private int id;

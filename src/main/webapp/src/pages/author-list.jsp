@@ -64,7 +64,7 @@
                                         InventoryTypeResponse item = inventoryTypes.get(i);
                             %>
                             <tr>
-                                <td><%= item.getId() %>
+                                <td><%= i + 1 %>
                                 </td>
                                 <td><%= item.getName() %>
                                 </td>
@@ -108,6 +108,7 @@
                                 </li>
                             </ul>
                         </nav>
+
                     </div>
                 </div>
             </div>
@@ -136,46 +137,37 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let deleteId = null;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    let deleteId = null;
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
 
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                deleteId = this.getAttribute('data-id');
-                deleteModal.show();
-            });
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            deleteId = this.getAttribute('data-id');
+            deleteModal.show();
         });
+    });
 
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-            console.log("Confirm delete button clicked", deleteId);
-            if (!deleteId) return;
-            const params = new URLSearchParams();
-            params.append('id', deleteId);
-            params.append('action', 'DELETE');
+    // Confirm delete action
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (!deleteId) return;
 
-            fetch(`<%= request.getContextPath() %>/inventory-type`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: params.toString()
+        fetch(`<%= request.getContextPath() %>/inventory-type?id=\${deleteId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    response.text().then(text => {
+                        alert(`Delete failed: \${text}`);
+                        deleteModal.hide();
+                    });
+                }
             })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        response.text().then(text => {
-                            alert(`Delete failed: ${text}`);
-                            deleteModal.hide();
-                        });
-                    }
-                })
-                .catch(error => {
-                    alert('Network error: ' + error.message);
-                    deleteModal.hide();
-                });
-        });
+            .catch(error => {
+                alert('Network error: ' + error.message);
+                deleteModal.hide();
+            });
     });
 </script>
 

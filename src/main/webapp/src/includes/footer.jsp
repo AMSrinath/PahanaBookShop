@@ -10,7 +10,6 @@
         link.addEventListener('click', function (e) {
             // e.preventDefault();
 
-            // Remove active class from all links
             document.querySelectorAll('.nav-link').forEach(el => {
                 el.classList.remove('active');
             });
@@ -54,17 +53,17 @@
     // });
 
     // Delete button handling
-    document.querySelectorAll('.btn-danger').forEach(button => {
-        button.addEventListener('click', function () {
-            const row = this.closest('tr');
-            const customerName = row.querySelector('td:nth-child(2)').textContent;
+    <%--document.querySelectorAll('.btn-danger').forEach(button => {--%>
+    <%--    button.addEventListener('click', function () {--%>
+    <%--        const row = this.closest('tr');--%>
+    <%--        const customerName = row.querySelector('td:nth-child(2)').textContent;--%>
 
-            if (confirm(`Are you sure you want to delete ${customerName}?`)) {
-                row.remove();
-                alert('Customer deleted successfully!');
-            }
-        });
-    });
+    <%--        if (confirm(`Are you sure you want to delete ${customerName}?`)) {--%>
+    <%--            row.remove();--%>
+    <%--            alert('Customer deleted successfully!');--%>
+    <%--        }--%>
+    <%--    });--%>
+    <%--});--%>
 
 
     // Customer form functionality
@@ -94,7 +93,7 @@
     // });
 
     // Edit customer button handling
-    document.querySelectorAll('.edit-btn').forEach(button => {
+    /*document.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener('click', function () {
             const id = this.getAttribute('data-id');
             const row = this.closest('.customer-row');
@@ -120,15 +119,15 @@
             document.getElementById('customer-form-view').classList.add('active');
             document.getElementById('page-title').textContent = 'Edit Customer';
         });
-    });
+    });*/
 
     // Clear/Reset form
-    clearBtn.addEventListener('click', function () {
-        customerForm.reset();
-    });
+    // clearBtn.addEventListener('click', function () {
+    //     customerForm.reset();
+    // });
 
-    // Save/Update customer
-    saveBtn.addEventListener('click', function () {
+    // SaveUpdate customer
+    /*saveBtn.addEventListener('click', function () {
         const fullName = document.getElementById('fullName').value;
         const email = document.getElementById('email').value;
         const phone = document.getElementById('phone').value;
@@ -152,7 +151,7 @@
         document.getElementById('customer-form-view').classList.remove('active');
         document.getElementById('customers-view').classList.add('active');
         document.getElementById('page-title').textContent = 'Customers';
-    });
+    });*/
 </script>
 </body>
 

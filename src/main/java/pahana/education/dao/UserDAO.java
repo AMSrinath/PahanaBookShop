@@ -1,10 +1,10 @@
 package pahana.education.dao;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import pahana.education.model.request.user.UserRequest;
+import pahana.education.model.request.UserRequest;
 import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.user.UserDataResponse;
+import pahana.education.model.response.UserDataResponse;
 import pahana.education.util.DBConnection;
 import pahana.education.util.JwtUtil;
 import pahana.education.util.enums.HttpStatusEnum;
