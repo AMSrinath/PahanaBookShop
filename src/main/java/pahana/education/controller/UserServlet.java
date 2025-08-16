@@ -1,8 +1,7 @@
-package pahana.education.controller.inventory;
+package pahana.education.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,12 +10,9 @@ import jakarta.servlet.http.Part;
 import org.json.JSONObject;
 import pahana.education.dao.AuthorDao;
 import pahana.education.dao.InventoryDao;
+import pahana.education.dao.UserDAO;
 import pahana.education.model.request.InventoryRequest;
-import pahana.education.model.request.InventoryTypeRequest;
-import pahana.education.model.response.AuthorDataResponse;
-import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.InventoryResponse;
-import pahana.education.model.response.InventoryTypeResponse;
+import pahana.education.model.response.*;
 import pahana.education.util.CommonResponseUtil;
 import pahana.education.util.CommonUtil;
 import pahana.education.util.FileUploads;
@@ -26,24 +22,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 
-@WebServlet(name = "inventoryServlet", value = "/inventory")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024,
-        maxFileSize = 1024 * 1024 * 5,
-        maxRequestSize = 1024 * 1024 * 10
-)
-public class InventoryServlet extends HttpServlet {
+@WebServlet(name = "userServlet", value = "/user")
+public class UserServlet extends HttpServlet {
     private static final String UPLOAD_DIR = "uploads";
     public void init() {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String idParam = request.getParameter("id");
+        String type = request.getParameter("type");
         String action = request.getParameter("action");
-        CommonResponse<List<InventoryResponse>> inventoryList = null;
+        CommonResponse<List<UserDataResponse>> userDataList = null;
 
         if (idParam != null && !idParam.isEmpty()) {
             try {
@@ -68,47 +59,62 @@ public class InventoryServlet extends HttpServlet {
             }
         }
 
-        if ("ADD-NEW".equalsIgnoreCase(action)) {
+        if ("customer".equalsIgnoreCase(type)) {
+            if ("add_new".equalsIgnoreCase(action)) {
+                try {
+                    List<UserRoleResponse> userRoles = UserDAO.getInstance().getAllUserRoles();
+                    request.setAttribute("userRoleList", userRoles);
+                    request.getRequestDispatcher("/src/pages/customer-form.jsp").forward(request, response);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                int page = 1;
+                int pageSize = 5;
+                String pageParam = request.getParameter("page");
+                if (pageParam != null) {
+                    try {
+                        page = Integer.parseInt(pageParam);
+                        if (page < 1) page = 1;
+                    } catch (NumberFormatException e) {
+                        page = 1;
+                    }
+                }
+
+                int offset = (page - 1) * pageSize;
+                try {
+                    userDataList = UserDAO.getInstance().getAllCustomerPaginate(pageSize, offset);
+                    int totalRecords = userDataList.getTotalCount();
+                    int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+                    request.setAttribute("customerList", userDataList.getData());
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("pageSize", pageSize);
+                    request.setAttribute("totalRecords", totalRecords);
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                request.getRequestDispatcher("/src/pages/customer-list.jsp").forward(request, response);
+            }
+
+        }
+
+
+        if ("staff".equalsIgnoreCase(type)) {
             try {
                 List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
                 List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
                 request.setAttribute("inventoryTypes", inventoryType);
                 request.setAttribute("authorList", authorDataResponses);
-                request.getRequestDispatcher("/src/pages/product-form.jsp").forward(request, response);
+                request.getRequestDispatcher("/src/pages/staff-list.jsp").forward(request, response);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        } else {
-            int page = 1;
-            int pageSize = 5;
-            String pageParam = request.getParameter("page");
-            if (pageParam != null) {
-                try {
-                    page = Integer.parseInt(pageParam);
-                    if (page < 1) page = 1;
-                } catch (NumberFormatException e) {
-                    page = 1;
-                }
-            }
-
-            int offset = (page - 1) * pageSize;
-            try {
-                inventoryList = InventoryDao.getInstance().getAllInventoryPaginate(pageSize, offset);
-
-                int totalRecords = inventoryList.getTotalCount();
-                int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-
-                request.setAttribute("inventoryList", inventoryList.getData());
-                request.setAttribute("currentPage", page);
-                request.setAttribute("totalPages", totalPages);
-                request.setAttribute("pageSize", pageSize);
-                request.setAttribute("totalRecords", totalRecords);
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            request.getRequestDispatcher("/src/pages/product-list.jsp").forward(request, response);
         }
+
+
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -265,5 +271,4 @@ public class InventoryServlet extends HttpServlet {
         }
     }
 
-    public void destroy() {}
 }

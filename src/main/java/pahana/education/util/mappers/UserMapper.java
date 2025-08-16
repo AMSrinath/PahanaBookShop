@@ -10,13 +10,13 @@ import java.sql.SQLException;
 public class UserMapper {
     public static UserDataResponse userDataResponse(ResultSet rs) throws SQLException {
         UserRoleResponse userRole = new UserRoleResponse(
-                rs.getInt("roleId"),
-                rs.getString("roleName"),
-                rs.getString("roleTitle")
+                rs.getInt("role_id"),
+                rs.getString("role_name"),
+                rs.getString("role_title")
         );
 
         return new UserDataResponse(
-                rs.getInt("userId"),
+                rs.getInt("user_id"),
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getDate("date_of_birth").toLocalDate(),
@@ -28,6 +28,7 @@ public class UserMapper {
                 rs.getString("email"),
                 rs.getString("user_name"),
                 rs.getString("title"),
+                rs.getBoolean("is_deleted"),
                 userRole
         );
     }

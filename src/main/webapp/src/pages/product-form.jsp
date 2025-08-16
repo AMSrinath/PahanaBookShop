@@ -13,7 +13,7 @@
     String baseUrl = request.getContextPath();
     String imagePath = (inventory != null && inventory.getDefaultImage() != null && !inventory.getDefaultImage().isEmpty())
             ? baseUrl + "/" + inventory.getDefaultImage()
-            : baseUrl + "/src/assets/images/uploads/default.jpg";
+            : baseUrl + "/src/assets/images/default.jpg";
 %>
 
 
@@ -122,7 +122,6 @@
                             <label class="form-label">Product Image</label>
                             <div class="image-upload-container">
                                 <div class="image-preview-form mb-3" id="imagePreview">
-                                    <%--                                    <img id="previewImage" src="${pageContext.request.contextPath}/src/assets/images/uploads/default.jpg"/>--%>
                                     <img id="previewImage" src="<%= imagePath %>" />
                                 </div>
 
@@ -137,6 +136,15 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>
 </div>
@@ -206,18 +214,6 @@
         });
     });
 
-    function showToast(message, type) {
-        const toastEl = document.getElementById('errorToast');
-        const toastBody = document.getElementById('toastMessage');
-
-        toastBody.innerText = message;
-        toastEl.classList.remove('bg-success', 'bg-danger');
-        toastEl.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
-
-        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
-        toast.show();
-    }
-
     $("#clear-btn").click(function() {
         $("#productForm")[0].reset();
         $("#previewImage").attr("src", "").hide();
@@ -258,98 +254,6 @@
     }
 
 </script>
-
-
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
-    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body" id="toastMessage"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-
-
-<%--<script>--%>
-<%--    $(document).ready(function () {--%>
-<%--        const imagePreview = $('#imagePreview');--%>
-<%--        const imageFile = $('#imageFile');--%>
-<%--        const uploadTrigger = $('#uploadTrigger');--%>
-<%--        const imageUrlInput = $('#imageUrlInput');--%>
-<%--        const removeImageBtn = $('#removeImageBtn');--%>
-
-<%--        // Initialize preview--%>
-<%--        function updatePreview(src) {--%>
-<%--            if (src) {--%>
-<%--                imagePreview.html(`<img id="previewImage" src="\${src}" alt="Preview" style="max-width: 100%; max-height: 100%;"/>`);--%>
-<%--                imagePreview.css('background-color', 'transparent');--%>
-<%--                imagePreview.css('border', 'none');--%>
-<%--                removeImageBtn.show();--%>
-<%--            } else {--%>
-<%--                imagePreview.html('<i class="fas fa-image text-muted" style="font-size: 3rem;"></i>');--%>
-<%--                imagePreview.css('background-color', '#f8f9fa');--%>
-<%--                imagePreview.css('border', '1px dashed #ccc');--%>
-<%--                removeImageBtn.hide();--%>
-<%--            }--%>
-<%--        }--%>
-
-<%--        // Trigger file input click--%>
-<%--        uploadTrigger.click(function () {--%>
-<%--            imageFile.click();--%>
-<%--        });--%>
-
-<%--        // Handle file selection--%>
-<%--        imageFile.change(function () {--%>
-<%--            if (this.files && this.files[0]) {--%>
-<%--                const reader = new FileReader();--%>
-<%--                reader.onload = function (e) {--%>
-<%--                    updatePreview(e.target.result);--%>
-<%--                    imageUrlInput.val('');--%>
-<%--                }--%>
-<%--                reader.readAsDataURL(this.files[0]);--%>
-<%--            }--%>
-<%--        });--%>
-<%--        --%>
-<%--        removeImageBtn.click(function () {--%>
-<%--            updatePreview(null);--%>
-<%--            imageUrlInput.val('');--%>
-<%--            imageFile.val('');--%>
-<%--        });--%>
-
-
-<%--        $('#save-btn').click(function () {--%>
-<%--            const formData = {--%>
-<%--                id: $('#id').val(),--%>
-<%--                barcode: $('[name="barcode"]').val(),--%>
-<%--                inventoryType: $('[name="inventoryType"]').val(),--%>
-<%--                isbnNo: $('[name="isbnNo"]').val(),--%>
-<%--                authorId: $('[name="authorId"]').val(),--%>
-<%--                defaultImage: $('[name="defaultImage"]').val(),--%>
-<%--                retailPrice: $('[name="retailPrice"]').val(),--%>
-<%--                costPrice: $('[name="costPrice"]').val(),--%>
-<%--                qtyHand: $('[name="qtyHand"]').val()--%>
-<%--            };--%>
-
-<%--            $.ajax({--%>
-<%--                url: '${pageContext.request.contextPath}/inventory',--%>
-<%--                type: 'POST',--%>
-<%--                contentType: 'application/json',--%>
-<%--                data: JSON.stringify(formData),--%>
-<%--                success: function (response) {--%>
-<%--                    if (response.success) {--%>
-<%--                        window.location.href = '${pageContext.request.contextPath}/inventory';--%>
-<%--                    } else {--%>
-<%--                        alert('Error: ' + response.message);--%>
-<%--                    }--%>
-<%--                },--%>
-<%--                error: function (xhr) {--%>
-<%--                    alert('Error saving product: ' + xhr.responseText);--%>
-<%--                }--%>
-<%--            });--%>
-<%--        });--%>
-
-<%--    })--%>
-<%--</script>--%>
 
 <%@ include file="../includes/footer.jsp" %>
 

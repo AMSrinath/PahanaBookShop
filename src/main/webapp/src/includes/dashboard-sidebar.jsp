@@ -1,6 +1,7 @@
 <div class="sidebar">
     <div class="sidebar-brand">
-        <h3><i class="fas fa-chart-line me-2"></i>SalesDash</h3>
+        <h3><i class="fas fa-chart-line me-2"></i>Pahana Book</h3>
+        <h3 style="align-content: center">Shop</h3>
     </div>
 
     <ul class="nav flex-column sidebar-nav">
@@ -25,35 +26,38 @@
                     </li>
                 </ul>
             </div>
-
-
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link" href="../pages/user-list.jsp" data-view="customers">
-                <i class="fas fa-users"></i> Customers
+        <li>
+            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#userMenu" role="button" aria-expanded="false">
+                <span><i class="fas fa-user-cog me-2"></i>Users</span>
+                <i class="fas fa-chevron-down"></i>
             </a>
+            <div class="collapse" id="userMenu">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
+                    <li>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/user?type=customer"><i class="fas fa-user-tie me-2"></i>Customer</a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory"><i class="fas fa-user-friends me-2"></i>Staff</a>
+                    </li>
+                </ul>
+            </div>
         </li>
+
         <li class="nav-item">
             <a class="nav-link" href="#">
                 <i class="fas fa-shopping-cart"></i> Sales
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-box"></i> Products
-            </a>
-        </li>
+
+
         <li class="nav-item">
             <a class="nav-link" href="#">
                 <i class="fas fa-chart-pie"></i> Reports
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </li>
+
         <li class="nav-item mt-4">
             <a class="nav-link" href="#">
                 <i class="fas fa-question-circle"></i> Help Center
@@ -67,6 +71,6 @@
     </ul>
 
     <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center text-white-50">
-        <small>v2.4.1 © 2025 SalesDash</small>
+        <small>v2.4.1 © 2025</small>
     </div>
 </div>

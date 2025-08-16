@@ -1,4 +1,4 @@
-package pahana.education.controller.inventory;
+package pahana.education.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "inventoryTypeServlet", value = "/inventory-type")

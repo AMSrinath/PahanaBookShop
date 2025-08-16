@@ -8,13 +8,15 @@
     <%@ include file="../includes/dashboard-header.jsp" %>
     <div class="view active" id="dashboard-view">
         <div class="container-fluid">
-            <div class="back-btn" id="back-to-customers">
-                <a href="customer-list.jsp.jsp">
-                    <i class="fas fa-arrow-left me-2"></i> Back to Customers
-                </a>
+            <div class="action-header">
+                <button id="" class="btn btn-primary">
+                    <a href="${pageContext.request.contextPath}/inventory">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Customers
+                    </a>
+                </button>
             </div>
 
-            <div class="customer-form-view">
+            <div class="custom-form-view">
                 <div class="form-header">
                     <h2 id="form-title"><i class="fas fa-user-plus me-2"></i>Add New Customer</h2>
                     <div class="form-buttons">

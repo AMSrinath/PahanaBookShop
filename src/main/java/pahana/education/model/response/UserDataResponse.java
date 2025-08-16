@@ -16,12 +16,13 @@ public class UserDataResponse {
     private String email;
     private String userName;
     private String title;
+    private boolean isActive;
     private UserRoleResponse userRole;
 
     public UserDataResponse(int id,String firstName, String lastName, LocalDate dateOfBirth,
                             String phoneNo, UserRequest.Gender gender, String address,
                             String userImagePath, String accountNo, String email,
-                            String userName, String title, UserRoleResponse userRole) {
+                            String userName, String title, boolean isActive, UserRoleResponse userRole) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -34,11 +35,16 @@ public class UserDataResponse {
         this.email = email;
         this.userName = userName;
         this.title = title;
+        this.isActive = isActive;
         this.userRole = userRole;
     }
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -135,5 +141,17 @@ public class UserDataResponse {
 
     public void setUserRole(UserRoleResponse userRole) {
         this.userRole = userRole;
+    }
+
+    public boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
 }
