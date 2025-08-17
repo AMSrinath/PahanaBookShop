@@ -1,10 +1,13 @@
 package pahana.education.model.request;
 
 import pahana.education.model.BaseModel;
+import pahana.education.util.enums.Gender;
 
 import java.time.LocalDate;
 
 public class UserRequest extends BaseModel {
+    private int userId;
+    private int userRoleId;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
@@ -17,11 +20,22 @@ public class UserRequest extends BaseModel {
     private String email;
     private String userName;
     private String title;
+    private Integer customerTypeId;
 
+    public int getUserId() {
+        return userId;
+    }
 
-    public enum Gender {
-        MALE,
-        FEMALE
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getUserRoleId() {
+        return userRoleId;
+    }
+
+    public void setUserRoleId(int userRoleId) {
+        this.userRoleId = userRoleId;
     }
 
     public String getFirstName() {
@@ -118,5 +132,13 @@ public class UserRequest extends BaseModel {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Integer getCustomerTypeId() {
+        return customerTypeId;
+    }
+
+    public void setCustomerTypeId(Integer customerTypeId) {
+        this.customerTypeId = customerTypeId;
     }
 }

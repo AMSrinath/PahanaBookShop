@@ -1,6 +1,19 @@
+<%@ page import="java.util.*" %>
+<%@ page import="pahana.education.model.response.UserDataResponse" %>
+<%
+    String pageTitle = "Customer";
+    int totalRecords  = (Integer) request.getAttribute("totalRecords");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    if (currentPage == null) currentPage = 1;
+    if (totalPages == null) totalPages = 1;
 
-
-<% String pageTitle = "Dashboard"; %>
+    int pageSize = (Integer) request.getAttribute("pageSize");
+    int startRecord = (currentPage - 1) * pageSize + 1;
+    int endRecord = Math.min(startRecord + pageSize - 1, totalRecords);
+    String baseUrl = request.getContextPath() + "/user?type=user&action=list";
+    String imageUrl = request.getContextPath();
+%>
 <%@ include file="../includes/header.jsp" %>
 
 <%@ include file="../includes/dashboard-sidebar.jsp" %>
@@ -11,9 +24,9 @@
         <div class="container-fluid">
             <div class="action-header">
                 <h2 class="page-title"></h2>
-                <button id="add-customer-btn" class="btn btn-primary">
-                    <a href="user-form.jsp">
-                        <i class="fas fa-plus me-2"></i>Add New Customer
+                <button id="add-customer-btn" class="btn btn-primary" >
+                    <a href="${pageContext.request.contextPath}/user?type=user&action=add_new">
+                        <i class="fas fa-plus me-2"></i>Add New User
                     </a>
                 </button>
             </div>
@@ -35,106 +48,69 @@
                         <table class="table table-hover table-sm">
                             <thead>
                             <tr>
+                                <th></th>
                                 <th>ID</th>
+                                <th>Account No</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Type</th>
+                                <th>Phone</th>
                                 <th>Status</th>
-                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody id="customerTableBody">
+                            <%
+                                List<UserDataResponse> customerList = (List<UserDataResponse>) request.getAttribute("customerList");
+                                if (customerList != null) {
+                                    for (int i = 0; i < customerList.size(); i++) {
+                                        UserDataResponse customer = customerList.get(i);
+
+                                        String imagePath = (customer != null && customer.getUserImagePath() != null && !customer.getUserImagePath().isEmpty())
+                                                ? imageUrl + "/" + customer.getUserImagePath()
+                                                : imageUrl + "/src/assets/images/user-default.png";
+                            %>
                             <tr>
-                                <td>#C1001</td>
-                                <td>Isabella Christensen</td>
-                                <td>isabella@example.com</td>
-                                <td><span class="badge badge-vip">VIP</span></td>
-                                <td><span class="badge badge-active">Active</span></td>
+                                <td><img src="<%= imagePath %>" style="width: 80px; height: auto; object-fit: cover;"></td>
+                                <td><%= customer.getId() %></td>
+                                <td><%= customer.getAccountNo() %></td>
+                                <td><%= customer.getFullName() %></td>
+                                <td><%= customer.getEmail() %></td>
+                                <td><%= customer.getPhoneNo() %></td>
+                                <td><%= !customer.getActive() ? "<span class=\"badge badge-active\">Active</span>" : ""   %>
+                                </td>
                                 <td class="action-buttons">
-                                    <button class="btn btn-sm btn-primary edit-btn" data-id="C1001">
+                                    <button class="btn btn-sm btn-primary edit-btn" data-id="C1002"
+                                            onclick="location.href='${pageContext.request.contextPath}/user?id=<%= customer.getId() %>'">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger delete-btn">
+                                    <button class="btn btn-sm btn-danger delete-btn" data-id="<%= customer.getId() %>">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>#C1002</td>
-                                <td>John Doe</td>
-                                <td>john@example.com</td>
-                                <td><span class="badge badge-business">Business</span></td>
-                                <td><span class="badge badge-active">Active</span></td>
-                                <td class="action-buttons">
-                                    <button class="btn btn-sm btn-primary edit-btn" data-id="C1002">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger delete-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#C1003</td>
-                                <td>Emma Smith</td>
-                                <td>emma@example.com</td>
-                                <td><span class="badge badge-individual">Individual</span></td>
-                                <td><span class="badge badge-pending">Pending</span></td>
-                                <td class="action-buttons">
-                                    <button class="btn btn-sm btn-primary edit-btn" data-id="C1003">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger delete-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#C1004</td>
-                                <td>Michael Johnson</td>
-                                <td>michael@example.com</td>
-                                <td><span class="badge badge-business">Business</span></td>
-                                <td><span class="badge badge-active">Active</span></td>
-                                <td class="action-buttons">
-                                    <button class="btn btn-sm btn-primary edit-btn" data-id="C1004">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger delete-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>#C1005</td>
-                                <td>Sarah Williams</td>
-                                <td>sarah@example.com</td>
-                                <td><span class="badge badge-vip">VIP</span></td>
-                                <td><span class="badge badge-inactive">Inactive</span></td>
-                                <td class="action-buttons">
-                                    <button class="btn btn-sm btn-primary edit-btn" data-id="C1005">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger delete-btn">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                            <%
+                                    }
+                                }
+                            %>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mt-4">
-                        <div>Showing 1 to 5 of 15 entries</div>
+                        <div>Showing  <%= startRecord %> to <%= endRecord %> of <%= totalRecords %> entries</div>
                         <nav>
                             <ul class="pagination mb-0">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#">Previous</a>
+                                <li class="page-item <%= (currentPage <= 1) ? "disabled" : "" %>">
+                                    <a class="page-link" href="<%= baseUrl + "&page=" + (currentPage - 1) %>">Previous</a>
                                 </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
+
+                                <% for (int i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= (i == currentPage) ? "active" : "" %>">
+                                    <a class="page-link" href="<%= baseUrl + "&page=" + i %>"><%= i %></a>
+                                </li>
+                                <% } %>
+
+                                <li class="page-item <%= (currentPage >= totalPages) ? "disabled" : "" %>">
+                                    <a class="page-link" href="<%= baseUrl + "&page=" + (currentPage + 1) %>">Next</a>
                                 </li>
                             </ul>
                         </nav>
@@ -145,5 +121,52 @@
     </div>
 
 </div>
+
+<%@ include file="../modals/delete-modal.jsp" %>
+
+<%@ include file="../includes/toast-message.jsp" %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let deleteId = null;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                deleteId = this.getAttribute('data-id');
+                deleteModal.show();
+            });
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            if (!deleteId) return;
+
+            const deleteData = {
+                userId: deleteId,
+            };
+            $.ajax({
+                url: "<%= request.getContextPath() %>/user",
+                type: "DELETE",
+                data: JSON.stringify(deleteData),
+                processData: false,
+                contentType: "application/json",
+                success: function (response) {
+                    if (response.code === 200) {
+                        deleteModal.hide();
+                        showToast(response.message, "success");
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showToast(response.message || "Something went wrong", "error");
+                    }
+                },
+                error: function (xhr) {
+                    showToast("Request failed: ", xhr);
+                }
+            });
+        });
+    });
+</script>
 
 <%@ include file="../includes/footer.jsp" %>

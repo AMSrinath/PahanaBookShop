@@ -1,4 +1,4 @@
-package pahana.education.controller.inventory;
+package pahana.education.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -11,8 +11,8 @@ import jakarta.servlet.http.Part;
 import org.json.JSONObject;
 import pahana.education.dao.AuthorDao;
 import pahana.education.dao.InventoryDao;
+import pahana.education.dao.UserDAO;
 import pahana.education.model.request.InventoryRequest;
-import pahana.education.model.request.InventoryTypeRequest;
 import pahana.education.model.response.AuthorDataResponse;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.InventoryResponse;
@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "inventoryServlet", value = "/inventory")
@@ -68,7 +67,7 @@ public class InventoryServlet extends HttpServlet {
             }
         }
 
-        if ("ADD-NEW".equalsIgnoreCase(action)) {
+        if ("add_new".equalsIgnoreCase(action)) {
             try {
                 List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
                 List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
@@ -163,7 +162,7 @@ public class InventoryServlet extends HttpServlet {
         invRequest.setDefaultImage(productImagePath);
 
 
-        if ("DELETE".equalsIgnoreCase(action)) {
+        if ("delete".equalsIgnoreCase(action)) {
             doDelete(request, response);
         } else {
             try {
@@ -242,22 +241,21 @@ public class InventoryServlet extends HttpServlet {
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String productId = request.getParameter("id");
-        if (productId == null || productId.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID parameter");
-            return;
-        }
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String jsonResponse = "";
+        JSONObject json =  CommonUtil.getJsonData(request);
+
+        String inventoryId =json.getString("inventoryId");
 
         try {
-            int id = Integer.parseInt(productId);
+            int id = Integer.parseInt(inventoryId);
             CommonResponse<String> deleteResponse = InventoryDao.getInstance().deleteInventory(id);
+            jsonResponse = CommonResponseUtil.getJsonResponse(deleteResponse);
+            out.write(jsonResponse);
+            out.flush();
+            out.close();
 
-            if (deleteResponse.getCode() == 200) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write(deleteResponse.getMessage());
-            } else {
-                response.sendError(deleteResponse.getCode(), deleteResponse.getMessage());
-            }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
         } catch (Exception e) {

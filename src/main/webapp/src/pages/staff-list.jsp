@@ -24,7 +24,7 @@
             <div class="action-header">
                 <h2 class="page-title"></h2>
                 <button id="add-customer-btn" class="btn btn-primary" >
-                    <a href="${pageContext.request.contextPath}/inventory?action=ADD-NEW">
+                    <a href="${pageContext.request.contextPath}/inventory?action=add_new">
                         <i class="fas fa-plus me-2"></i>Add New Product
                     </a>
                 </button>
@@ -33,7 +33,7 @@
             <div class="row">
                 <div class="customer-table">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3><i class="fas fa-users me-2"></i>Product List</h3>
+                        <h3><i class="fas fa-users me-2"></i>Staff List</h3>
                         <div class="d-flex">
                             <input type="text" class="form-control me-2" placeholder="Search customers"
                                    id="searchInput">
@@ -49,6 +49,7 @@
                             <tr>
                                 <th></th>
                                 <th>ID</th>
+                                <th>Account No</th>
                                 <th>Name</th>
                                 <th>Type</th>
                                 <th>Status</th>
@@ -60,13 +61,11 @@
                                 if (itemsList != null) {
                                     for (int i = 0; i < itemsList.size(); i++) {
                                         InventoryResponse item = itemsList.get(i);
-                                        String imagePath = (item != null && item.getDefaultImage() != null && !item.getDefaultImage().isEmpty())
-                                                ? request.getContextPath() + "/" + item.getDefaultImage()
-                                                : request.getContextPath() + "/src/assets/images/product-default.jpeg";
                             %>
                             <tr>
-                                <td><img src="<%= imagePath%>" style="width: 80px; height: auto; object-fit: cover;"></td>
+                                <td><img src="${pageContext.request.contextPath}/<%= item.getDefaultImage() %>" style="width: 80px; height: auto; object-fit: cover;"></td>
                                 <td><%= item.getId() %></td>
+                                <td></td>
                                 <td><%= item.getName() %>
                                 </td>
                                 <td><%= !item.getActive() ? "<span class=\"badge badge-active\">Active</span>" : ""   %>
@@ -133,7 +132,7 @@
         </div>
     </div>
 </div>
-<%@ include file="../includes/toast-message.jsp" %>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         let deleteId = null;
@@ -147,32 +146,33 @@
         });
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            console.log("Confirm delete button clicked", deleteId);
             if (!deleteId) return;
+            const params = new URLSearchParams();
+            params.append('id', deleteId);
+            params.append('action', 'DELETE');
 
-            const deleteData = {
-                inventoryId: deleteId,
-            };
-            $.ajax({
-                url: "<%= request.getContextPath() %>/inventory",
-                type: "DELETE",
-                data: JSON.stringify(deleteData),
-                processData: false,
-                contentType: "application/json",
-                success: function (response) {
-                    if (response.code === 200) {
-                        deleteModal.hide();
-                        showToast(response.message, "success");
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
-                    } else {
-                        showToast(response.message || "Something went wrong", "error");
-                    }
+            fetch(`<%= request.getContextPath() %>/inventory-type`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                error: function (xhr) {
-                    showToast("Request failed: ", xhr);
-                }
-            });
+                body: params.toString()
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        response.text().then(text => {
+                            alert(`Delete failed: ${text}`);
+                            deleteModal.hide();
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert('Network error: ' + error.message);
+                    deleteModal.hide();
+                });
         });
     });
 </script>

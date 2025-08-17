@@ -1,4 +1,4 @@
-package pahana.education.controller.author;
+package pahana.education.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -7,18 +7,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 import pahana.education.dao.AuthorDao;
-import pahana.education.dao.InventoryDao;
-import pahana.education.model.request.InventoryRequest;
 import pahana.education.model.response.AuthorDataResponse;
 import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.InventoryTypeResponse;
-import pahana.education.util.FileUploads;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "authorServlet", value = "/author")

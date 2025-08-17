@@ -181,54 +181,6 @@ public class InventoryDao {
 
     /***************************************************************************************************/
     /** Inventory Business Process */
-//    public CommonResponse<String> createInventory111(InventoryRequest inventoryRequest) throws SQLException {
-//        Connection conn = DBConnection.getInstance().getConnection();
-//        try {
-//            // Insert into inventory
-//            String invSql = "INSERT INTO inventory (barcode,name, default_image, inventory_type, author_id, isbn_no) VALUES (?, ?, ?, ?, ?, ?)";
-//
-//            PreparedStatement invStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
-//            invStmt.setString(1, inventoryRequest.getBarcode());
-//            invStmt.setString(2, inventoryRequest.getName());
-//            invStmt.setString(3, inventoryRequest.getDefaultImage());
-//            invStmt.setInt(4, inventoryRequest.getInventoryTypeId());
-//            invStmt.setInt(5, 1);
-//            invStmt.setString(6, inventoryRequest.getIsbnNo());
-//
-//            int invRows = invStmt.executeUpdate();
-//            if (invRows == 0) {
-//                throw new SQLException("Creating inventory failed, no rows affected.");
-//            }
-//
-//            int inventoryId;
-//            try (ResultSet generatedKeys = invStmt.getGeneratedKeys()) {
-//                if (generatedKeys.next()) {
-//                    inventoryId = generatedKeys.getInt(1);
-//                } else {
-//                    throw new SQLException("Creating inventory failed, no ID obtained.");
-//                }
-//            }
-//
-//            // Add price_list
-//            String priceSql = "INSERT INTO price_list (retail_price, cost_price, qty_hand, inventory_id)  VALUES (?, ?, ?, ?)";
-//            PreparedStatement priceStmt = conn.prepareStatement(priceSql);
-//            priceStmt.setDouble(1, inventoryRequest.getRetailPrice());
-//            priceStmt.setDouble(2, inventoryRequest.getCostPrice());
-//            priceStmt.setInt(3, inventoryRequest.getQtyHand());
-//            priceStmt.setInt(4, inventoryId);
-//
-//            priceStmt.executeUpdate();
-//            conn.commit();
-//            return new CommonResponse<>(200, "Product created successfully", null);
-//
-//        } catch (SQLException e) {
-//            conn.rollback();
-//            return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
-//        } finally {
-//            conn.setAutoCommit(true);
-//        }
-//    }
-
     public List<InventoryResponse> getAllInventory() throws SQLException {
         List<InventoryResponse> inventory = new ArrayList<>();
         try {
