@@ -1,5 +1,6 @@
 package pahana.education.model.response;
 import pahana.education.model.request.UserRequest;
+import pahana.education.util.enums.Gender;
 
 import java.time.LocalDate;
 
@@ -9,7 +10,7 @@ public class UserDataResponse {
     private String lastName;
     private LocalDate dateOfBirth;
     private String phoneNo;
-    private UserRequest.Gender gender;
+    private Gender gender;
     private String address;
     private String userImagePath;
     private String accountNo;
@@ -20,7 +21,7 @@ public class UserDataResponse {
     private UserRoleResponse userRole;
 
     public UserDataResponse(int id,String firstName, String lastName, LocalDate dateOfBirth,
-                            String phoneNo, UserRequest.Gender gender, String address,
+                            String phoneNo, Gender gender, String address,
                             String userImagePath, String accountNo, String email,
                             String userName, String title, boolean isActive, UserRoleResponse userRole) {
         this.id = id;
@@ -79,11 +80,11 @@ public class UserDataResponse {
         this.phoneNo = phoneNo;
     }
 
-    public UserRequest.Gender getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(UserRequest.Gender gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 

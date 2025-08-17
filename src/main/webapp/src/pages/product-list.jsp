@@ -133,7 +133,7 @@
         </div>
     </div>
 </div>
-
+<%@ include file="../includes/toast-message.jsp" %>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         let deleteId = null;
@@ -147,33 +147,32 @@
         });
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-            console.log("Confirm delete button clicked", deleteId);
             if (!deleteId) return;
-            const params = new URLSearchParams();
-            params.append('id', deleteId);
-            params.append('action', 'DELETE');
 
-            fetch(`<%= request.getContextPath() %>/inventory-type`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: params.toString()
-            })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
+            const deleteData = {
+                inventoryId: deleteId,
+            };
+            $.ajax({
+                url: "<%= request.getContextPath() %>/inventory",
+                type: "DELETE",
+                data: JSON.stringify(deleteData),
+                processData: false,
+                contentType: "application/json",
+                success: function (response) {
+                    if (response.code === 200) {
+                        deleteModal.hide();
+                        showToast(response.message, "success");
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
                     } else {
-                        response.text().then(text => {
-                            alert(`Delete failed: ${text}`);
-                            deleteModal.hide();
-                        });
+                        showToast(response.message || "Something went wrong", "error");
                     }
-                })
-                .catch(error => {
-                    alert('Network error: ' + error.message);
-                    deleteModal.hide();
-                });
+                },
+                error: function (xhr) {
+                    showToast("Request failed: ", xhr);
+                }
+            });
         });
     });
 </script>

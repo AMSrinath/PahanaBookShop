@@ -313,6 +313,29 @@ public class UserDAO {
         return new CommonResponse<>(200, "Email is available", null);
     }
 
+    public CommonResponse<String> deleteUser(int id) throws SQLException {
+
+        try{
+            String sql = "UPDATE user SET is_deleted = 1 WHERE id = ?";
+            Connection conn = DBConnection.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, id);
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                return new CommonResponse<>(200, "User deleted successfully", null);
+            } else {
+                return new CommonResponse<>(404, "User not found", null);
+            }
+        } catch (SQLException e) {
+            return new CommonResponse<>(
+                    500,
+                    "Database error: " + e.getMessage(),
+                    null
+            );
+        }
+    }
 
 
 }

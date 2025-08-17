@@ -17,6 +17,7 @@ import pahana.education.model.response.*;
 import pahana.education.util.CommonResponseUtil;
 import pahana.education.util.CommonUtil;
 import pahana.education.util.FileUploads;
+import pahana.education.util.enums.Gender;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -100,7 +101,6 @@ public class UserServlet extends HttpServlet {
             }
 
         }
-
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -145,118 +145,62 @@ public class UserServlet extends HttpServlet {
         usrRequest.setEmail(email);
         usrRequest.setPassword(password);
         usrRequest.setDateOfBirth(dob);
-        usrRequest.setGender(UserRequest.Gender.valueOf(gender.toUpperCase()));
+        usrRequest.setGender(Gender.valueOf(gender.toUpperCase()));
         usrRequest.setAddress(address);
         usrRequest.setAccountNo(accountNo);
         usrRequest.setCustomerTypeId(CommonUtil.checkIntValue(customerTypeId, 0));
         usrRequest.setUserImagePath(productImagePath);
 
-
-        if ("DELETE".equalsIgnoreCase(action)) {
-            doDelete(request, response);
-        } else {
-            try {
-                CommonResponse<String> userData;
-                if (userId != null && !userId.isEmpty()) {
-                    int id = Integer.parseInt(userId);
-                    int userRoleId = Integer.parseInt(roleId);
-                    usrRequest.setUserId(id);
-                    usrRequest.setUserRoleId(userRoleId);
-                    userData = UserDAO.getInstance().updateInventory(usrRequest);
-                } else {
-                    CommonResponse<String> emailExists = UserDAO.getInstance().checkEmailExists(email);
-                    if (emailExists.getCode() == 409) {
-                        userData = emailExists;
-                    } else {
-                        userData = UserDAO.getInstance().createUser(usrRequest);
-                    }
-                }
-
-                jsonResponse = CommonResponseUtil.getJsonResponse(userData);
-                out.write(jsonResponse);
-                out.flush();
-                out.close();
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        ObjectMapper mapper = new ObjectMapper();
-
         try {
-            String id = request.getParameter("id");
-            String barcode = request.getParameter("barcode");
-            String itemName = request.getParameter("itemName");
-            int inventoryTypeId = CommonUtil.checkIntValue(request.getParameter("inventoryTypeId"), 0);
-            int authorId = CommonUtil.checkIntValue(request.getParameter("authorId"), 0);
-            String isbnNo = request.getParameter("isbnNo");
-            double retailPrice = CommonUtil.checkDoubleValue(request.getParameter("retailPrice"), 0);
-            double costPrice =  CommonUtil.checkDoubleValue(request.getParameter("costPrice"),0);
-            int qtyHand =  CommonUtil.checkIntValue(request.getParameter("qtyHand"), 0);
-
-            String imagePath = null;
-            Part filePart = request.getPart("imageFile");
-            if (filePart != null && filePart.getSize() > 0) {
-                imagePath = FileUploads.handleFileUpload(request, filePart, UPLOAD_DIR);
+            CommonResponse<String> userData;
+            if (userId != null && !userId.isEmpty()) {
+                int id = Integer.parseInt(userId);
+                int userRoleId = Integer.parseInt(roleId);
+                usrRequest.setUserId(id);
+                usrRequest.setUserRoleId(userRoleId);
+                userData = UserDAO.getInstance().updateInventory(usrRequest);
+            } else {
+                CommonResponse<String> emailExists = UserDAO.getInstance().checkEmailExists(email);
+                if (emailExists.getCode() == 409) {
+                    userData = emailExists;
+                } else {
+                    userData = UserDAO.getInstance().createUser(usrRequest);
+                }
             }
 
-            boolean isBarcodeExist = InventoryDao.getInstance().isBarcodeExists(barcode);
-            boolean isbnNoExists = InventoryDao.getInstance().isIsbnNoExists(barcode);
-            CommonResponse<InventoryTypeResponse> inventoryTypeByIdData = InventoryDao.getInstance().getInventoryTypeById(inventoryTypeId);
+            jsonResponse = CommonResponseUtil.getJsonResponse(userData);
+            out.write(jsonResponse);
+            out.flush();
+            out.close();
 
-            InventoryRequest invRequest = new InventoryRequest();
-            invRequest.setId(Integer.parseInt(id));
-            invRequest.setBarcode(barcode);
-            invRequest.setInventoryTypeId(inventoryTypeId);
-            invRequest.setAuthorId(authorId);
-            invRequest.setIsbnNo(isbnNo);
-            invRequest.setRetailPrice(retailPrice);
-            invRequest.setCostPrice(costPrice);
-            invRequest.setQtyHand(qtyHand);
-            invRequest.setDefaultImage(imagePath);
-            invRequest.setName(itemName);
-
-            CommonResponse<String> result = InventoryDao.getInstance().updateInventory(invRequest);
-            out.print(mapper.writeValueAsString(result));
-
-        } catch (Exception e) {
-            CommonResponse<String> error = new CommonResponse<>(
-                    500,
-                    "Error: " + e.getMessage(),
-                    null
-            );
-            out.print(mapper.writeValueAsString(error));
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String productId = request.getParameter("id");
-        if (productId == null || productId.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing ID parameter");
-            return;
-        }
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String jsonResponse = "";
+        JSONObject json =  CommonUtil.getJsonData(request);
+
+        String userId =json.getString("userId");
 
         try {
-            int id = Integer.parseInt(productId);
-            CommonResponse<String> deleteResponse = InventoryDao.getInstance().deleteInventory(id);
+            CommonResponse<String> returnData;
+            int id = Integer.parseInt(userId);
+            CommonResponse<String> deleteResponse = UserDAO.getInstance().deleteUser(id);
+            jsonResponse = CommonResponseUtil.getJsonResponse(deleteResponse);
+            out.write(jsonResponse);
+            out.flush();
+            out.close();
 
-            if (deleteResponse.getCode() == 200) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write(deleteResponse.getMessage());
-            } else {
-                response.sendError(deleteResponse.getCode(), deleteResponse.getMessage());
-            }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid ID format");
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Delete failed: " + e.getMessage());
         }
     }
+
 
 }

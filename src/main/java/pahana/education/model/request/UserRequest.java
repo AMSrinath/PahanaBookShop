@@ -1,6 +1,7 @@
 package pahana.education.model.request;
 
 import pahana.education.model.BaseModel;
+import pahana.education.util.enums.Gender;
 
 import java.time.LocalDate;
 
@@ -20,12 +21,6 @@ public class UserRequest extends BaseModel {
     private String userName;
     private String title;
     private Integer customerTypeId;
-
-
-    public enum Gender {
-        MALE,
-        FEMALE
-    }
 
     public int getUserId() {
         return userId;

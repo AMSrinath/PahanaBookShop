@@ -1,10 +1,18 @@
 <%@ page import="pahana.education.model.response.UserRoleResponse" %>
 <%@ page import="pahana.education.model.response.UserDataResponse" %>
 <%@ page import="java.util.List" %>
+<%@ page import="pahana.education.util.enums.Gender" %>
 <%
     String pageTitle = "User Form";
     String idParam = request.getParameter("id");
     UserDataResponse userResponse = (UserDataResponse) request.getAttribute("userData");
+    boolean isPasswordHide = (userResponse != null);
+
+    String baseUrl = request.getContextPath();
+    String imagePath = (userResponse != null && userResponse.getUserImagePath() != null && !userResponse.getUserImagePath().isEmpty())
+            ? baseUrl + "/" + userResponse.getUserImagePath()
+            : baseUrl + "/src/assets/images/default.jpg";
+%>
 %>
 
 
@@ -44,10 +52,10 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Title</label>
                             <select name="title" class="form-select" id="title" >
-                                <option></option>
-                                <option>Mr.</option>
-                                <option>Mrs.</option>
-                                <option>Miss.</option>
+                                <option value="">-- Select Inventory Type --</option>
+                                <option value="Mr." <%= (userResponse != null && "Mr.".equalsIgnoreCase(userResponse.getTitle())) ? "selected" : "" %>>Mr.</option>
+                                <option value="Mrs." <%= (userResponse != null && "Mrs.".equalsIgnoreCase(userResponse.getTitle())) ? "selected" : "" %>>Mrs.</option>
+                                <option value="Miss." <%= (userResponse != null && "Miss.".equalsIgnoreCase(userResponse.getTitle())) ? "selected" : "" %>>Miss.</option>
                             </select>
                         </div>
 
@@ -71,8 +79,9 @@
                                     List<UserRoleResponse> roleList = (List<UserRoleResponse>) request.getAttribute("userRoleList");
                                     if (roleList != null) {
                                         for (UserRoleResponse role : roleList) {
+                                            boolean isSelected = (userResponse != null && userResponse.getUserRole().getId() == role.getId());
                                 %>
-                                <option value="<%= role.getId() %>"  > <%= role.getTitle() %></option>
+                                <option value="<%= role.getId() %>" <%= isSelected ? "selected" : "" %> > <%= role.getTitle() %></option>
                                 <%
                                         }
                                     }
@@ -82,19 +91,23 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Account No</label>
-                            <input type="text" name="accountNo" class="form-control" placeholder="Enter Account No" required id="accountNo">
+                            <input type="text" name="accountNo" class="form-control" placeholder="Enter Account No" required id="accountNo"
+                                   value="<%= (userResponse != null) ? userResponse.getAccountNo() : "" %>">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone Number</label>
-                            <input type="text" name="phoneNo" class="form-control" placeholder="Enter phone no" required id="phoneNo">
+                            <input type="text" name="phoneNo" class="form-control" placeholder="Enter phone no" required id="phoneNo"
+                                   value="<%= (userResponse != null) ? userResponse.getPhoneNo() : "" %>">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email Address</label>
-                            <input type="email" name="email" class="form-control" placeholder="Enter email" required id="email">
+                            <input type="email" name="email" class="form-control" placeholder="Enter email" required id="email"
+                                   value="<%= (userResponse != null) ? userResponse.getEmail() : "" %>">
                         </div>
 
+                        <% if (!isPasswordHide) { %>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Password</label>
                             <div class="input-group">
@@ -104,24 +117,28 @@
                                 </button>
                             </div>
                         </div>
+                        <% } %>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Date of Birth</label>
-                            <input type="date" name="dateOfBirth" class="form-control" placeholder="Enter email" required id="dateOfBirth">
+                            <input type="date" name="dateOfBirth" class="form-control" placeholder="Enter date of birth" required id="dateOfBirth"
+                                   value="<%= (userResponse != null) ? userResponse.getDateOfBirth() : "" %>">
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Gender</label>
                             <select name="gender" class="form-select" id="gender" required>
-                                <option></option>
-                                <option>MALE</option>
-                                <option>FEMALE</option>
+                                <option value="">-- Select Inventory Type --</option>
+                                <option value="MALE" <%= (userResponse != null && userResponse.getGender() == Gender.MALE) ? "selected" : "" %>>MALE</option>
+                                <option value="FEMALE" <%= (userResponse != null && userResponse.getGender() == Gender.FEMALE) ? "selected" : "" %>>FEMALE</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Address</label>
-                            <textarea name="address" class="form-control" placeholder="Enter billing address" id="address" rows="3"></textarea>
+                            <textarea name="address" class="form-control" placeholder="Enter billing address" id="address" rows="3">
+                                <%= (userResponse != null) ? userResponse.getAddress().trim() : "" %>
+                            </textarea>
                         </div>
                     </div>
 
@@ -130,7 +147,7 @@
                             <label class="form-label">Product Image</label>
                             <div class="image-upload-container">
                                 <div class="image-preview-form mb-3" id="imagePreview">
-                                    <img id="previewImage" src="${pageContext.request.contextPath}/src/assets/images/default.jpg" />
+                                    <img id="previewImage" src="<%= imagePath%>" />
                                 </div>
 
                                 <div class="input-group mb-2">
@@ -148,21 +165,27 @@
     </div>
 </div>
 
-<script>
-    document.getElementById("togglePassword").addEventListener("click", function () {
-        const passwordField = document.getElementById("password");
-        const icon = this.querySelector("i");
+<%@ include file="../includes/toast-message.jsp" %>
 
-        if (passwordField.type === "password") {
-            passwordField.type = "text";
-            icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash");
-        } else {
-            passwordField.type = "password";
-            icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye");
-        }
-    });
+<script>
+    const isPasswordShowHide = '<%= isPasswordHide %>';
+    if (!isPasswordShowHide) {
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const passwordField = document.getElementById("password");
+            const icon = this.querySelector("i");
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                passwordField.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        });
+    }
+
 
     toggleAccountNo();
     $('#customerTypeId').change(toggleAccountNo);
@@ -227,7 +250,7 @@
                 type: "POST",
                 data: JSON.stringify(newFormData),
                 processData: false,
-                contentType: false,
+                contentType: "application/json",
                 success: function (response) {
                     if (response.code === 200) {
                         showToast(response.message, "success");
@@ -239,7 +262,6 @@
                     }
                 },
                 error: function (xhr) {
-                    console.log("Request failed:", xhr);
                     showToast("Request failed: ", xhr);
                 }
             });
@@ -332,15 +354,5 @@
         return true;
     }
 </script>
-
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
-    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-            <div class="toast-body" id="toastMessage"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-</div>
-
 
 <%@ include file="../includes/footer.jsp" %>
