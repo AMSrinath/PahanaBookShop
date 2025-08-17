@@ -23,6 +23,7 @@ public class JwtUtil {
         claims.put("firstName", userDataResponse.getFirstName());
         claims.put("lastName", userDataResponse.getLastName());
         claims.put("role", userDataResponse.getUserRole().getName());
+        claims.put("userImage", userDataResponse.getUserImagePath());
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -41,6 +42,29 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+        } catch (JwtException e) {
+            return null;
+        }
+    }
+
+    public static Map<String, Object> decodeToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            Map<String, Object> userDetails = new HashMap<>();
+            userDetails.put("userId", claims.get("userId"));
+            userDetails.put("email", claims.get("email"));
+            userDetails.put("firstName", claims.get("firstName"));
+            userDetails.put("lastName", claims.get("lastName"));
+            userDetails.put("role", claims.get("role"));
+            userDetails.put("userImage", claims.get("userImage"));
+            userDetails.put("username", claims.getSubject());
+
+            return userDetails;
         } catch (JwtException e) {
             return null;
         }

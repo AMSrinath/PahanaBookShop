@@ -8,6 +8,8 @@
     <title><%= pageTitle != null ? pageTitle : "My App" %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="${pageContext.request.contextPath}/src/assets/js/common.js"></script>
     <link rel="stylesheet" href="./src/assets/css/style.css">
 </head>
 <body>
@@ -25,7 +27,7 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
             </div>
             <div class="d-grid">
-                <button type="submit" class="btn btn-primary"><a href="src/pages/main.jsp"></a>Login</button>
+                <button id="login-btn" type="button" class="btn btn-primary">Login</button>
             </div>
         </form>
         <div class="mt-3 text-center">
@@ -33,5 +35,52 @@
         </div>
     </div>
 </div>
+
+<%@ include file="./src/includes/toast-message.jsp" %>
+
+<script>
+    $(document).ready(function () {
+        $("#login-btn").click(function(event) {
+            console.log("Response11:");
+            event.preventDefault()
+            const login = {
+                email: $('[name="email"]').val().trim(),
+                password: $('[name="password"]').val().trim(),
+            };
+
+            if (!login.email || !login.password) {
+                showToast("Please fill in all fields.", "danger");
+                return;
+            }
+
+            $.ajax({
+                url: "<%= request.getContextPath() %>/login",
+                type: "POST",
+                data: JSON.stringify(login),
+                processData: false,
+                contentType: "application/json",
+                success: function (response) {
+                    console.log("Response2:", response);
+                    if (response.code === 200) {
+
+                        localStorage.setItem("user", JSON.stringify(response.data));
+                        localStorage.setItem("token", response.data.token);
+
+                        showToast(response.message, "success");
+                        setTimeout(() => {
+                            window.location.href = "<%= request.getContextPath() %>/src/pages/dashboard.jsp";
+                        }, 2000);
+                    } else {
+                        showToast(response.message || "Something went wrong", "error");
+                    }
+                },
+                error: function (xhr) {
+                    console.log("Response333:", xhr);
+                    showToast("Request failed: ","error");
+                }
+            });
+        });
+    });
+</script>
 
 <%@ include file="src/includes/footer.jsp" %>

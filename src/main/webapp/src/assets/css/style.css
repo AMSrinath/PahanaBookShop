@@ -427,3 +427,7 @@ body {
 .custom-toast.bg-danger {
     background-color: #dc3545;
 }
+
+.custom-toast.bg-warning {
+    background-color: #ffb300;
+}

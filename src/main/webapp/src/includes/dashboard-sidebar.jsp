@@ -28,7 +28,12 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="${pageContext.request.contextPath}/src/pages/tets.jsp">
+                <i class="fas fa-shopping-cart"></i> Sales
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="${pageContext.request.contextPath}/src/pages/test1.jsp">
                 <i class="fas fa-shopping-cart"></i> Sales
             </a>
         </li>
@@ -61,8 +66,8 @@
                 <i class="fas fa-question-circle"></i> Help Center
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
+        <li class="nav-item" >
+            <a class="nav-link" href="${pageContext.request.contextPath}/logout">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>

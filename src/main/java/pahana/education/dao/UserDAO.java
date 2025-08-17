@@ -36,30 +36,37 @@ public class UserDAO {
         UserDataResponse data = null;
 
         try {
-            String sql = "SELECT usr.id as user_id, usr.first_name AS fName, usr.last_name AS lName,usr.password, " +
+            String sql1 = "SELECT usr.id as user_id, usr.first_name AS fName, usr.last_name AS lName,usr.password, " +
                     "rl.id as role_id, rl.name as role_name, rl.title as role_title " +
                     "FROM user usr INNER JOIN user_role ur ON usr.id = ur.user_id " +
                     "INNER JOIN role rl on ur.role_id = rl.id " +
                     "WHERE usr.email=?";
+
+            String sql ="SELECT u.id as user_id, u.first_name, u.last_name, u.user_name, u.title, \n" +
+                    "u.date_of_birth, u.phone_no, u.email, u.gender, u.account_no, u.user_image_path, u.is_deleted, u.password, \n" +
+                    "u.address, r.name as role_name, r.title as role_title, r.id as role_id FROM user u \n" +
+                    "left join user_role ur on  u.id = ur.user_id\n" +
+                    "left join role r on r.id = ur.role_id\n" +
+                    "where u.is_deleted = 0 and u.email=?";
             Connection conn = DBConnection.getInstance().getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, loginRequest.getEmail());
             ResultSet rs = stmt.executeQuery();
 
             if (!rs.next()) {
+                data = null;
                statusCode = HttpStatusEnum.NOT_FOUND.getCode();
-               message = "Email does not exist";
+               message = "Email incorrect";
             } else {
                 String hashedPassword = rs.getString("password");
                 BCrypt.Result result = BCrypt.verifyer().verify(loginRequest.getPassword().toCharArray(), hashedPassword);
 
                 if (!result.verified) {
+                    data = null;
                     statusCode = HttpStatusEnum.UNAUTHORIZED.getCode();
                     message = "Invalid password";
                 } else {
                     data = UserMapper.userDataResponse(rs);
-                    String token = JwtUtil.generateToken(data);
-
                     statusCode = HttpStatusEnum.OK.getCode();
                     message = "Login successful";
                 }

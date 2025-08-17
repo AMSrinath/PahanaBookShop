@@ -1,6 +1,7 @@
 package pahana.education.util;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -32,6 +33,14 @@ public class CommonUtil {
             jsonBuffer.append(line);
         }
 
-        return new JSONObject(jsonBuffer.toString());
+//        return new JSONObject(jsonBuffer.toString());
+        String raw = jsonBuffer.toString().trim();
+        System.out.println("Incoming JSON: " + raw);
+
+        if (raw.startsWith("{")) {
+            return new JSONObject(raw);
+        } else {
+            throw new JSONException("Invalid JSON input: does not start with '{'");
+        }
     }
 }

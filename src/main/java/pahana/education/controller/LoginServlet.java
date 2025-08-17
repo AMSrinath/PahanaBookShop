@@ -5,14 +5,20 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 import pahana.education.dao.UserDAO;
 import pahana.education.model.request.LoginRequest;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.UserDataResponse;
+import pahana.education.util.CommonResponseUtil;
+import pahana.education.util.CommonUtil;
+import pahana.education.util.JwtUtil;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "loginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
@@ -20,16 +26,15 @@ public class LoginServlet extends HttpServlet {
     public void init() {}
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String userEmail = request.getParameter("username");
-        String password = request.getParameter("password");
+    }
 
-        HashMap<String, String> errors = validateUserForm(userEmail, password);
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
 
-        if (!errors.isEmpty()) {
-            request.setAttribute("errors", errors);
-            request.getRequestDispatcher("index.jsp").forward(request, response);
-            return;
-        }
+        JSONObject json =  CommonUtil.getJsonData(request);
+        String userEmail = json.getString("email");
+        String password = json.getString("password");
 
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail(userEmail);
@@ -37,15 +42,32 @@ public class LoginServlet extends HttpServlet {
 
         try {
             CommonResponse<UserDataResponse> userDAO = UserDAO.getInstance().login(loginRequest);
+
             if (userDAO.getCode() == 200) {
-                request.getSession().setAttribute("user", userDAO.getMessage());
-                response.sendRedirect("dashboard");
+                String token = JwtUtil.generateToken(userDAO.getData());
+                Map<String, Object> decodedData = JwtUtil.decodeToken(token);
+                decodedData.put("token", token);
+
+                CommonResponse<Map<String, Object>> responseData = new CommonResponse<>(
+                        200,
+                        "Login successful",
+                        decodedData
+                );
+
+                String jsonResponse = CommonResponseUtil.getJsonResponse(responseData);
+                out.write(jsonResponse);
             } else {
-                request.setAttribute("error", userDAO.getMessage());
-                request.getRequestDispatcher("index.jsp").forward(request, response);
+                String jsonResponse = CommonResponseUtil.getJsonResponse(userDAO);
+                out.write(jsonResponse);
             }
+            out.flush();
+            out.close();
+
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            response.setStatus(500);
+            out.write("{\"code\":500,\"message\":\"Internal server error\"}");
+            out.flush();
+            out.close();
         }
     }
 
