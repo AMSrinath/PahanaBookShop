@@ -1,23 +1,20 @@
 package pahana.education.dao;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import jakarta.servlet.ServletException;
+import pahana.education.model.request.InventoryRequest;
 import pahana.education.model.request.UserRequest;
 import pahana.education.model.request.LoginRequest;
-import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.InventoryTypeResponse;
-import pahana.education.model.response.UserDataResponse;
-import pahana.education.model.response.UserRoleResponse;
+import pahana.education.model.response.*;
 import pahana.education.util.DBConnection;
 import pahana.education.util.JwtUtil;
 import pahana.education.util.enums.HttpStatusEnum;
+import pahana.education.util.mappers.InventoryMapper;
 import pahana.education.util.mappers.InventoryTypeMapper;
 import pahana.education.util.mappers.UserMapper;
 import pahana.education.util.mappers.UserRoleMapper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +94,28 @@ public class UserDAO {
         return isSuccess;
     }
 
+    public CommonResponse<UserDataResponse> getUserById(int id) throws SQLException {
+        int statusCode = 0;
+        String message = "";
+        UserDataResponse data = null;
+
+        Connection conn = DBConnection.getInstance().getConnection();
+        PreparedStatement ps = conn.prepareStatement("SELECT u.id as user_id, u.first_name, u.last_name, u.user_name, u.title, \n" +
+                "u.date_of_birth, u.phone_no, u.email, u.gender, u.account_no, u.user_image_path, u.is_deleted, \n" +
+                "u.address, r.name as role_name, r.title as role_title, r.id as role_id FROM user u \n" +
+                "left join user_role ur on  u.id = ur.user_id\n" +
+                "left join role r on r.id = ur.role_id\n" +
+                "where u.is_deleted = 0 and u.id = ?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            data = UserMapper.userDataResponse(rs);
+        }
+
+        return new CommonResponse<>(statusCode, message, data);
+    }
+
     public List<UserRoleResponse> getAllUserRoles() throws SQLException {
         List<UserRoleResponse> userRoleList = new ArrayList<>();
         try {
@@ -116,7 +135,7 @@ public class UserDAO {
         return userRoleList;
     }
 
-    public CommonResponse<List<UserDataResponse>> getAllCustomerPaginate(int limit, int offset) throws SQLException {
+    public CommonResponse<List<UserDataResponse>> getAllUserPaginate(int limit, int offset) throws SQLException {
         int statusCode = 0;
         String message = "";
         int totalCount = 0;
@@ -128,7 +147,7 @@ public class UserDAO {
             PreparedStatement countStmt = conn.prepareStatement("SELECT count(u.id)  FROM user u \n" +
                     "left join user_role ur on  u.id = ur.user_id\n" +
                     "left join role r on r.id = ur.role_id\n" +
-                    "where u.is_deleted = 0 and r.name = 'customer'");
+                    "where u.is_deleted = 0");
             ResultSet countRs = countStmt.executeQuery();
             if (countRs.next()) {
                 totalCount = countRs.getInt(1);
@@ -142,7 +161,7 @@ public class UserDAO {
                     "u.address, r.name as role_name, r.title as role_title, r.id as role_id FROM user u \n" +
                     "left join user_role ur on  u.id = ur.user_id\n" +
                     "left join role r on r.id = ur.role_id\n" +
-                    "where u.is_deleted = 0 and r.name ='customer' LIMIT ? OFFSET ? ");
+                    "where u.is_deleted = 0 LIMIT ? OFFSET ? ");
             ps.setInt(1, limit);
             ps.setInt(2, offset);
             ResultSet rs = ps.executeQuery();
@@ -164,52 +183,134 @@ public class UserDAO {
         return new CommonResponse<>(statusCode, message, data, totalCount);
     }
 
-    public CommonResponse<List<UserDataResponse>> getAllStaffPaginate(int limit, int offset) throws SQLException {
-        int statusCode = 0;
-        String message = "";
-        int totalCount = 0;
-        List<UserDataResponse> data = null;
-        List<UserDataResponse> userDataList = new ArrayList<>();
-
+    public CommonResponse<String> createUser(UserRequest userRequest) throws SQLException {
+        Connection conn = DBConnection.getInstance().getConnection();
         try {
-            Connection conn = DBConnection.getInstance().getConnection();
-            PreparedStatement countStmt = conn.prepareStatement("SELECT count(u.id)  FROM user u \n" +
-                    "left join user_role ur on  u.id = ur.user_id\n" +
-                    "left join role r on r.id = ur.role_id\n" +
-                    "where u.is_deleted = 0 and r.name = `customer`");
-            ResultSet countRs = countStmt.executeQuery();
-            if (countRs.next()) {
-                totalCount = countRs.getInt(1);
-            }
-            countRs.close();
-            countStmt.close();
+            conn.setAutoCommit(false);
 
+            String invSql = "INSERT INTO user (first_name, last_name, date_of_birth, phone_no, gender, address,user_image_path,password,account_no,email,title)  " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement usrStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
+            usrStmt.setString(1, userRequest.getFirstName());
+            usrStmt.setString(2, userRequest.getLastName());
+            usrStmt.setString(3, userRequest.getDateOfBirth().toString());
+            usrStmt.setString(4, userRequest.getPhoneNo());
+            usrStmt.setString(5, userRequest.getGender().toString());
+            usrStmt.setString(6, userRequest.getAddress());
+            usrStmt.setString(7, userRequest.getUserImagePath());
 
-            PreparedStatement ps = conn.prepareStatement("SELECT u.id as user_id, u.first_name, u.last_name, \n" +
-                    "u.date_of_birth, u.phone_no, u.email, u.gender, u.account_no, u.user_image_path, u.is_deleted, \n" +
-                    "u.address, r.name as role_name, r.id as role_id FROM user u \n" +
-                    "left join user_role ur on  u.id = ur.user_id\n" +
-                    "left join role r on r.id = ur.role_id\n" +
-                    "where u.is_deleted = 0 and r.name =`customer` LIMIT ? OFFSET ? ");
-            ps.setInt(1, limit);
-            ps.setInt(2, offset);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                UserDataResponse  mappedData = UserMapper.userDataResponse(rs);
-                userDataList.add(mappedData);
+            String hashedPassword = BCrypt.withDefaults().hashToString(12, userRequest.getPassword().toCharArray());
+            usrStmt.setString(8, hashedPassword);
+            usrStmt.setString(9, userRequest.getAccountNo());
+            usrStmt.setString(10, userRequest.getEmail());
+            usrStmt.setString(11, userRequest.getTitle());
+            int invRows = usrStmt.executeUpdate();
+
+            if (invRows == 0) {
+                throw new SQLException("User create failed, no rows affected.");
             }
 
-            statusCode = HttpStatusEnum.OK.getCode();
-            message = "Inventory type created successfully";
-            data = userDataList;
+            int userId;
+            try (ResultSet generatedKeys = usrStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    userId = generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("User create failed, no ID obtained.");
+                }
+            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            statusCode = HttpStatusEnum.INTERNAL_SERVER_ERROR.getCode();
-            message = "An error occurred while creating inventory type.";
+            String priceSql = " INSERT INTO user_role ( user_id, role_id) VALUES (?, ?)";
+            PreparedStatement priceStmt = conn.prepareStatement(priceSql);
+            priceStmt.setDouble(1, userId);
+            priceStmt.setDouble(2, userRequest.getCustomerTypeId());
+            priceStmt.executeUpdate();
+
+            conn.commit();
+            return new CommonResponse<>(200, "User create successfully", null);
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // rollback only works if auto-commit is false
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            return new CommonResponse<>(500, "Error user create: " + e.getMessage(), null);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+    }
 
-        return new CommonResponse<>(statusCode, message, data, totalCount);
+    public CommonResponse<String> updateInventory(UserRequest userRequest) throws SQLException, ServletException {
+        Connection conn = DBConnection.getInstance().getConnection();
+
+        try{
+            conn.setAutoCommit(false);
+            String sql = "UPDATE user SET first_name = ?, last_name = ?, date_of_birth = ?, phone_no = ?, gender = ?, address = ?,user_image_path = ?," +
+                    "password = ?,account_no = ?,email = ?, title = ? WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, userRequest.getFirstName());
+            ps.setString(2, userRequest.getLastName());
+            ps.setString(3, userRequest.getDateOfBirth().toString());
+            ps.setString(4, userRequest.getPhoneNo());
+            ps.setString(5, userRequest.getGender().toString());
+            ps.setString(6, userRequest.getAddress());
+            ps.setString(7, userRequest.getUserImagePath());
+
+            String hashedPassword = BCrypt.withDefaults().hashToString(12, userRequest.getPassword().toCharArray());
+            ps.setString(8, hashedPassword);
+            ps.setString(9, userRequest.getAccountNo());
+            ps.setString(10, userRequest.getEmail());
+            ps.setString(11, userRequest.getTitle());
+            ps.setInt(12, userRequest.getUserId());
+            ps.executeUpdate();
+
+            String priceSql = "UPDATE user_role SET user_id =? , role_id = ? WHERE id = ?";
+            PreparedStatement priceStmt = conn.prepareStatement(priceSql);
+            priceStmt.setDouble(1, userRequest.getUserId());
+            priceStmt.setDouble(2, userRequest.getCustomerTypeId());
+            priceStmt.setDouble(3, userRequest.getUserRoleId());
+            priceStmt.executeUpdate();
+
+            conn.commit();
+            return new CommonResponse<>(200, "Product created successfully", null);
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // rollback only works if auto-commit is false
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public  CommonResponse<String> checkEmailExists(String email) throws SQLException {
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT COUNT(*) FROM user WHERE email = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next() && rs.getInt(1) > 0) {
+            return new CommonResponse<>(409, "Email already exists", null);
+        }
+        return new CommonResponse<>(200, "Email is available", null);
     }
 
 

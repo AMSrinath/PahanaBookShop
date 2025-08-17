@@ -12,6 +12,7 @@ import pahana.education.dao.AuthorDao;
 import pahana.education.dao.InventoryDao;
 import pahana.education.dao.UserDAO;
 import pahana.education.model.request.InventoryRequest;
+import pahana.education.model.request.UserRequest;
 import pahana.education.model.response.*;
 import pahana.education.util.CommonResponseUtil;
 import pahana.education.util.CommonUtil;
@@ -21,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 
@@ -38,20 +40,18 @@ public class UserServlet extends HttpServlet {
 
         if (idParam != null && !idParam.isEmpty()) {
             try {
-                List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
-                List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
+                List<UserRoleResponse> userRoles = UserDAO.getInstance().getAllUserRoles();
 
                 int id = Integer.parseInt(idParam);
-                CommonResponse<InventoryResponse> inventory = InventoryDao.getInstance().getInventoryById(id);
-                if (inventory.getData() != null) {
-                    request.setAttribute("inventoryTypes", inventoryType);
-                    request.setAttribute("authorList", authorDataResponses);
-                    request.setAttribute("inventoriesData", inventory.getData());
-                    request.getRequestDispatcher("/src/pages/product-form.jsp").forward(request, response);
+                CommonResponse<UserDataResponse> userData = UserDAO.getInstance().getUserById(id);
+                if (userData.getData() != null) {
+                    request.setAttribute("userRoleList", userRoles);
+                    request.setAttribute("userData", userData.getData());
+                    request.getRequestDispatcher("/src/pages/user-form.jsp").forward(request, response);
                     return;
                 } else {
-                    request.setAttribute("errorMessage", "Inventory type not found");
-                    request.getRequestDispatcher("/src/pages/product-list.jsp").forward(request, response);
+                    request.setAttribute("errorMessage", "user not found");
+                    request.getRequestDispatcher("/src/pages/user-list.jsp").forward(request, response);
                     return;
                 }
             } catch (Exception e) {
@@ -59,12 +59,12 @@ public class UserServlet extends HttpServlet {
             }
         }
 
-        if ("customer".equalsIgnoreCase(type)) {
+        if ("user".equalsIgnoreCase(type)) {
             if ("add_new".equalsIgnoreCase(action)) {
                 try {
                     List<UserRoleResponse> userRoles = UserDAO.getInstance().getAllUserRoles();
                     request.setAttribute("userRoleList", userRoles);
-                    request.getRequestDispatcher("/src/pages/customer-form.jsp").forward(request, response);
+                    request.getRequestDispatcher("/src/pages/user-form.jsp").forward(request, response);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -83,7 +83,7 @@ public class UserServlet extends HttpServlet {
 
                 int offset = (page - 1) * pageSize;
                 try {
-                    userDataList = UserDAO.getInstance().getAllCustomerPaginate(pageSize, offset);
+                    userDataList = UserDAO.getInstance().getAllUserPaginate(pageSize, offset);
                     int totalRecords = userDataList.getTotalCount();
                     int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
@@ -96,53 +96,36 @@ public class UserServlet extends HttpServlet {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
-                request.getRequestDispatcher("/src/pages/customer-list.jsp").forward(request, response);
+                request.getRequestDispatcher("/src/pages/user-list.jsp").forward(request, response);
             }
 
         }
-
-
-        if ("staff".equalsIgnoreCase(type)) {
-            try {
-                List<InventoryTypeResponse> inventoryType = InventoryDao.getInstance().getAllInventoryType();
-                List<AuthorDataResponse> authorDataResponses = AuthorDao.getInstance().getAllAuthorList();
-                request.setAttribute("inventoryTypes", inventoryType);
-                request.setAttribute("authorList", authorDataResponses);
-                request.getRequestDispatcher("/src/pages/staff-list.jsp").forward(request, response);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
 
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-
-        StringBuilder jsonBuffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            jsonBuffer.append(line);
-        }
+        String jsonResponse = "";
 
         String action = request.getParameter("action");
-        JSONObject json = new JSONObject(jsonBuffer.toString());
+
+        JSONObject json =  CommonUtil.getJsonData(request);
 
         String productImagePath = "";
-        String productId = json.getString("productId");
-        String priceListId = json.getString("priceListId");
-        String barcode = json.getString("barcode");
-        String itemName = json.getString("itemName");
-        String inventoryTypeId = json.getString("inventoryTypeId");
-        String author = json.getString("authorId") == "" ? null : json.getString("authorId");
-        String isbnNo = json.getString("isbnNo");
-        String retailPrice = json.getString("retailPrice");
-        String costPrice = json.getString("costPrice");
-        String qtyHand = json.getString("qtyHand");
-        String base64DataUrl = json.getString("productImage");
+        String userId = json.getString("userId");
+        String roleId = json.getString("userRoleId");
+        String firstName = json.getString("firstName");
+        String lastName = json.getString("lastName");
+        String phoneNo = json.getString("phoneNo");
+        String email = json.getString("email");
+        String password = json.getString("password");
+        String dateOfBirth = json.getString("dateOfBirth");
+        String gender = json.getString("gender");
+        String address = json.getString("address");
+        String customerTypeId = json.getString("customerTypeId");
+        String accountNo = json.getString("accountNo");
+        String base64DataUrl = json.getString("userImage");
 
         if (!base64DataUrl.equals("") && base64DataUrl != null || !base64DataUrl.isEmpty()) {
             String base64Image = base64DataUrl.split(",")[1]; // remove data:image/... prefix
@@ -150,41 +133,46 @@ public class UserServlet extends HttpServlet {
             productImagePath= FileUploads.handleImageUpload(request, imageBytes, UPLOAD_DIR);
         }
 
-
-        Integer authorId = null;
-        if (author != null && !JSONObject.NULL.equals(author)) {
-            authorId = Integer.valueOf(author);
+        LocalDate dob = null;
+        if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+            dob = LocalDate.parse(dateOfBirth);
         }
 
-
-        InventoryRequest invRequest = new InventoryRequest();
-        invRequest.setName(itemName);
-        invRequest.setBarcode(barcode);
-        invRequest.setInventoryTypeId(CommonUtil.checkIntValue(inventoryTypeId, 0));
-        invRequest.setAuthorId(authorId);
-        invRequest.setIsbnNo(isbnNo);
-        invRequest.setRetailPrice(CommonUtil.checkDoubleValue(retailPrice, 0));
-        invRequest.setCostPrice(CommonUtil.checkDoubleValue(costPrice, 0));
-        invRequest.setQtyHand(CommonUtil.checkIntValue(qtyHand, 0));
-        invRequest.setDefaultImage(productImagePath);
+        UserRequest usrRequest = new UserRequest();
+        usrRequest.setFirstName(firstName);
+        usrRequest.setLastName(lastName);
+        usrRequest.setPhoneNo(phoneNo);
+        usrRequest.setEmail(email);
+        usrRequest.setPassword(password);
+        usrRequest.setDateOfBirth(dob);
+        usrRequest.setGender(UserRequest.Gender.valueOf(gender.toUpperCase()));
+        usrRequest.setAddress(address);
+        usrRequest.setAccountNo(accountNo);
+        usrRequest.setCustomerTypeId(CommonUtil.checkIntValue(customerTypeId, 0));
+        usrRequest.setUserImagePath(productImagePath);
 
 
         if ("DELETE".equalsIgnoreCase(action)) {
             doDelete(request, response);
         } else {
             try {
-                CommonResponse<String> inventoryData;
-                if (productId != null && !productId.isEmpty()) {
-                    int id = Integer.parseInt(productId);
-                    int priceId = Integer.parseInt(priceListId);
-                    invRequest.setId(id);
-                    invRequest.setPriceListId(priceId);
-                    inventoryData = InventoryDao.getInstance().updateInventory(invRequest);
+                CommonResponse<String> userData;
+                if (userId != null && !userId.isEmpty()) {
+                    int id = Integer.parseInt(userId);
+                    int userRoleId = Integer.parseInt(roleId);
+                    usrRequest.setUserId(id);
+                    usrRequest.setUserRoleId(userRoleId);
+                    userData = UserDAO.getInstance().updateInventory(usrRequest);
                 } else {
-                    inventoryData = InventoryDao.getInstance().createInventory(invRequest);
+                    CommonResponse<String> emailExists = UserDAO.getInstance().checkEmailExists(email);
+                    if (emailExists.getCode() == 409) {
+                        userData = emailExists;
+                    } else {
+                        userData = UserDAO.getInstance().createUser(usrRequest);
+                    }
                 }
 
-                String jsonResponse = CommonResponseUtil.getJsonResponse(inventoryData);
+                jsonResponse = CommonResponseUtil.getJsonResponse(userData);
                 out.write(jsonResponse);
                 out.flush();
                 out.close();

@@ -6,7 +6,6 @@
 
     <ul class="nav flex-column sidebar-nav">
         <li class="nav-item">
-<%--            <a class="nav-link active" href="../pages/dashboard.jsp" data-view="dashboard">--%>
             <a class="nav-link active" href="${pageContext.request.contextPath}/src/pages/dashboard.jsp" data-view="dashboard">
                 <i class="fas fa-home"></i> Dashboard
             </a>
@@ -28,6 +27,12 @@
             </div>
         </li>
 
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fas fa-shopping-cart"></i> Sales
+            </a>
+        </li>
+
         <li>
             <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#userMenu" role="button" aria-expanded="false">
                 <span><i class="fas fa-user-cog me-2"></i>Users</span>
@@ -36,21 +41,14 @@
             <div class="collapse" id="userMenu">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/user?type=customer"><i class="fas fa-user-tie me-2"></i>Customer</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory"><i class="fas fa-user-friends me-2"></i>Author</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory"><i class="fas fa-user-friends me-2"></i>Staff</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/user?type=user"><i class="fas fa-user-tie me-2"></i>User</a>
                     </li>
                 </ul>
             </div>
         </li>
-
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-shopping-cart"></i> Sales
-            </a>
-        </li>
-
 
         <li class="nav-item">
             <a class="nav-link" href="#">
