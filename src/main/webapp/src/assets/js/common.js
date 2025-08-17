@@ -10,4 +10,8 @@ function showToast(message, type) {
     toast.show();
 }
 
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+}
 

@@ -18,6 +18,7 @@ public class UserDataResponse {
     private String userName;
     private String title;
     private boolean isActive;
+    private String token;
     private UserRoleResponse userRole;
 
     public UserDataResponse(int id,String firstName, String lastName, LocalDate dateOfBirth,
@@ -150,6 +151,14 @@ public class UserDataResponse {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getFullName() {
