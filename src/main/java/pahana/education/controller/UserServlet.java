@@ -158,7 +158,7 @@ public class UserServlet extends HttpServlet {
                 int userRoleId = Integer.parseInt(roleId);
                 usrRequest.setUserId(id);
                 usrRequest.setUserRoleId(userRoleId);
-                userData = UserDAO.getInstance().updateInventory(usrRequest);
+                userData = UserDAO.getInstance().updateUser(usrRequest);
             } else {
                 CommonResponse<String> emailExists = UserDAO.getInstance().checkEmailExists(email);
                 if (emailExists.getCode() == 409) {

@@ -254,7 +254,7 @@ public class UserDAO {
         }
     }
 
-    public CommonResponse<String> updateInventory(UserRequest userRequest) throws SQLException, ServletException {
+    public CommonResponse<String> updateUser(UserRequest userRequest) throws SQLException, ServletException {
         Connection conn = DBConnection.getInstance().getConnection();
 
         try{

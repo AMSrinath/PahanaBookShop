@@ -265,7 +265,7 @@ public class InventoryDao {
             }
 
             statusCode = HttpStatusEnum.OK.getCode();
-            message = "Inventory type created successfully";
+            message = "Inventory fetch successfully";
             data = inventoryList;
 
         } catch (Exception e) {

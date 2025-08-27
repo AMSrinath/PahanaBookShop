@@ -24,7 +24,7 @@
             <div class="action-header">
                 <h2 class="page-title"></h2>
                 <button id="add-customer-btn" class="btn btn-primary" >
-                    <a href="${pageContext.request.contextPath}/inventory?action=ADD-NEW">
+                    <a href="${pageContext.request.contextPath}/inventory?action=add_new">
                         <i class="fas fa-plus me-2"></i>Add New Product
                     </a>
                 </button>

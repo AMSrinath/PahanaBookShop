@@ -1,3 +1,8 @@
+<%
+    String currentPath = request.getServletPath();
+%>
+
+
 <div class="sidebar">
     <div class="sidebar-brand">
         <h3><i class="fas fa-chart-line me-2"></i>Pahana Book</h3>
@@ -6,50 +11,71 @@
 
     <ul class="nav flex-column sidebar-nav">
         <li class="nav-item">
-            <a class="nav-link active" href="${pageContext.request.contextPath}/src/pages/dashboard.jsp" data-view="dashboard">
+            <a class="nav-link <%= currentPath.contains("/src/pages/dashboard.jsp") ? "active" : "" %>"
+               href="${pageContext.request.contextPath}/src/pages/dashboard.jsp" data-view="dashboard">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
+
+
+        <%
+            boolean isProductMenu = currentPath.contains("/src/pages/product-type-list.jsp") || currentPath.contains("/src/pages/product-list.jsp");
+        %>
         <li>
-            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#salesMenu" role="button" aria-expanded="false">
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse"
+               href="#salesMenu"
+               role="button"
+               aria-expanded="<%= isProductMenu %>"
+               style="color: white !important;"
+            >
                 <span><i class="fas fa-shopping-cart me-2"></i>Products</span>
                 <i class="fas fa-chevron-down"></i>
             </a>
-            <div class="collapse" id="salesMenu">
+            <div class="collapse <%= isProductMenu ? "show" : "" %>" id="salesMenu">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory-type"><i class="fas fa-paint-brush me-2"></i>Product types</a>
+                        <a class="nav-link <%= currentPath.contains("/src/pages/product-type-list.jsp") ? "active" : "" %>"
+                           href="${pageContext.request.contextPath}/inventory-type"><i class="fas fa-paint-brush me-2"></i>Product types</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory"><i class="fas fa-copy me-2"></i>Products</a>
+                        <a class="nav-link <%= currentPath.contains("/src/pages/product-list.jsp") ? "active" : "" %>"
+                           href="${pageContext.request.contextPath}/inventory"><i class="fas fa-copy me-2"></i>Products</a>
                     </li>
                 </ul>
             </div>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="${pageContext.request.contextPath}/src/pages/tets.jsp">
-                <i class="fas fa-shopping-cart"></i> Sales
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="${pageContext.request.contextPath}/src/pages/test1.jsp">
+            <a class="nav-link <%= currentPath.contains("/src/pages/sales.jsp") ? "active" : "" %>"
+               href="${pageContext.request.contextPath}/src/pages/sales.jsp">
                 <i class="fas fa-shopping-cart"></i> Sales
             </a>
         </li>
 
+
+        <%
+            boolean isUserMenu = currentPath.contains("/user");
+        %>
         <li>
-            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#userMenu" role="button" aria-expanded="false">
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse"
+               href="#userMenu"
+               role="button"
+               aria-expanded="<%= isUserMenu %>"
+               style="color: white !important;"
+            >
                 <span><i class="fas fa-user-cog me-2"></i>Users</span>
                 <i class="fas fa-chevron-down"></i>
             </a>
-            <div class="collapse" id="userMenu">
+            <div class="collapse <%= isUserMenu ? "show" : "" %>" id="userMenu">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/inventory"><i class="fas fa-user-friends me-2"></i>Author</a>
+                        <a class="nav-link" href=""><i class="fas fa-user-friends me-2"></i>My Account</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/user?type=user"><i class="fas fa-user-tie me-2"></i>User</a>
+                        <a class="nav-link <%= currentPath.contains("/user") ? "active" : "" %>"
+                           href="${pageContext.request.contextPath}/user?type=user"><i class="fas fa-user-tie me-2"></i>User</a>
                     </li>
                 </ul>
             </div>

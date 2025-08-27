@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.json.JSONObject;
 import pahana.education.dao.UserDAO;
 import pahana.education.model.request.LoginRequest;
@@ -44,9 +45,12 @@ public class LoginServlet extends HttpServlet {
             CommonResponse<UserDataResponse> userDAO = UserDAO.getInstance().login(loginRequest);
 
             if (userDAO.getCode() == 200) {
-                String token = JwtUtil.generateToken(userDAO.getData());
-                Map<String, Object> decodedData = JwtUtil.decodeToken(token);
-                decodedData.put("token", token);
+                String userData = JwtUtil.generateToken(userDAO.getData());
+                HttpSession session = request.getSession();
+                session.setAttribute("user", userDAO.getData());
+
+                Map<String, Object> decodedData = JwtUtil.decodeToken(userData);
+                decodedData.put("token", userData);
 
                 CommonResponse<Map<String, Object>> responseData = new CommonResponse<>(
                         200,

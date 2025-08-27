@@ -36,6 +36,18 @@
     </div>
 </div>
 
+<!-- Spinner Overlay -->
+<div id="spinner-overlay" style="display: none;">
+    <div class="spinner-container d-flex justify-content-center align-items-center"
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+         background-color: rgba(0,0,0,0.5); z-index: 9999;">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+
 <%@ include file="./src/includes/toast-message.jsp" %>
 
 <script>
@@ -53,6 +65,8 @@
                 return;
             }
 
+            $("#spinner-overlay").show();
+
             $.ajax({
                 url: "<%= request.getContextPath() %>/login",
                 type: "POST",
@@ -60,12 +74,10 @@
                 processData: false,
                 contentType: "application/json",
                 success: function (response) {
-                    console.log("Response2:", response);
                     if (response.code === 200) {
-
                         localStorage.setItem("user", JSON.stringify(response.data));
                         localStorage.setItem("token", response.data.token);
-
+                        $("#spinner-overlay").hide();
                         showToast(response.message, "success");
                         setTimeout(() => {
                             window.location.href = "<%= request.getContextPath() %>/src/pages/dashboard.jsp";
