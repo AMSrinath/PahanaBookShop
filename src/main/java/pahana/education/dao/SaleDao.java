@@ -110,14 +110,15 @@ public class SaleDao {
         try {
             conn.setAutoCommit(false);
 
-            String invSql = "INSERT INTO sales_invoice (invoice_total_gross, invoice_total_net, customer_id, cashier_id, tax_amount) " +
-                    "VALUES (?, ?, ?, ?, ?)";
+            String invSql = "INSERT INTO sales_invoice (invoice_total_gross, invoice_total_net, customer_id, cashier_id, tax_amount,invoice_no) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement invStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
             invStmt.setDouble(1, saleRequest.getTotalGross());
             invStmt.setDouble(2, saleRequest.getTotalNet());
             invStmt.setInt(3, saleRequest.getCustomerId());
             invStmt.setInt(4, saleRequest.getCashierId());
             invStmt.setDouble(5, saleRequest.getTaxAmount());
+            invStmt.setString(6, saleRequest.getInvoiceNo());
 
             int getProductRows = invStmt.executeUpdate();
 

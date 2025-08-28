@@ -349,6 +349,7 @@
             $('#balance').text('Rs. ' + balance.toFixed(2));
         }
 
+        let invoiceNumber;
         // Complete sale
         $('#complete-sale').click(function() {
             if(cart.length === 0) {
@@ -356,13 +357,16 @@
                 return;
             }
 
+            invoiceNumber = 'INV-' + new Date().getTime()
+
             const saleData = {
                 cashierId: 1,
                 customerId: currentCustomer ? currentCustomer.id : null,
                 saleItems: cart,
                 cashReceived: parseFloat($('#cash-received').val()),
                 taxAmount: 100,
-                total: parseFloat($('#total').text().replace('Rs. ', ''))
+                total: parseFloat($('#total').text().replace('Rs. ', '')),
+                invoiceNo: invoiceNumber
             };
 
             if (saleData.customerId === null ||
@@ -404,9 +408,8 @@
         // Print bill
         $('#print-bill').click(function() {
             const printContent = $('#print-template').clone().removeClass('d-none');
-            const invoiceNo = 'INV-' + new Date().getTime();
 
-            printContent.find('#print-invoice-no').text(invoiceNo);
+            printContent.find('#print-invoice-no').text(invoiceNumber);
             printContent.find('#print-total').text($('#total').text());
             printContent.find('#print-cash').text('Rs. ' + $('#cash-received').val());
             printContent.find('#print-balance').text($('#balance').text());

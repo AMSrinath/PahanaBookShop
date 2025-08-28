@@ -1,14 +1,15 @@
 <%@ page import="pahana.education.model.response.UserDataResponse" %>
+<%@ page import="java.util.Arrays" %>
 <%
     String currentPath = request.getServletPath();
 
-    UserDataResponse user = (UserDataResponse) session.getAttribute("user");
-    if (user ==null || user.getUserRole() == null || user.getUserRole().getName().isEmpty()) {
+    UserDataResponse sessionUser = (UserDataResponse) session.getAttribute("user");
+    if (sessionUser ==null || sessionUser.getUserRole() == null || sessionUser.getUserRole().getName().isEmpty()) {
         response.sendRedirect(request.getContextPath() + "/index.jsp");
         return;
     }
 
-    String userRole = user.getUserRole().getName();
+    String userRole = sessionUser.getUserRole().getName();
 %>
 
 
@@ -30,6 +31,7 @@
         <%
             boolean isProductMenu = currentPath.contains("/src/pages/product-type-list.jsp") || currentPath.contains("/src/pages/product-list.jsp");
         %>
+        <% if (Arrays.asList("admin", "store_keeper").contains(userRole)) { %>
         <li>
             <a class="nav-link d-flex justify-content-between align-items-center"
                data-bs-toggle="collapse"
@@ -43,7 +45,7 @@
             </a>
             <div class="collapse <%= isProductMenu ? "show" : "" %>" id="salesMenu">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
-                    <% if ("admin".equals(userRole)) { %>
+
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/product-type-list.jsp") ? "active" : "" %>"
                                href="${pageContext.request.contextPath}/inventory-type"><i class="fas fa-paint-brush me-2"></i>Product types</a>
@@ -52,12 +54,13 @@
                             <a class="nav-link <%= currentPath.contains("/src/pages/product-list.jsp") ? "active" : "" %>"
                                href="${pageContext.request.contextPath}/inventory"><i class="fas fa-copy me-2"></i>Products</a>
                         </li>
-                    <% } %>
                 </ul>
             </div>
         </li>
+        <% } %>
 
-        <% if ("admin".equals(userRole)  || "cashier".equals(userRole)) { %>
+
+        <% if (Arrays.asList("admin", "cashier").contains(userRole)) { %>
             <li class="nav-item">
                 <a class="nav-link <%= currentPath.contains("/src/pages/sales.jsp") ? "active" : "" %>"
                    href="${pageContext.request.contextPath}/src/pages/sales.jsp">
@@ -97,23 +100,91 @@
                     <% } %>
 
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/user?id=<%= user.getId() %>&action=my_account">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/user?id=<%= sessionUser.getId() %>&action=my_account">
                             <i class="fas fa-user-friends me-2"></i>My Account
                         </a>
                     </li>
-
-
                 </ul>
             </div>
         </li>
 
-        <% if ("admin".equals(userRole)) { %>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="fas fa-chart-pie"></i> Reports
+        <%
+            boolean isReportMenu = currentPath.contains("/src/pages/reports-daily-sales.jsp")
+                    || currentPath.contains("/src/pages/reports-daily-sales.jsp")
+                    || currentPath.contains("/src/pages/product-list.jsp");
+        %>
+        <li>
+            <a class="nav-link d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse"
+               href="#reportMenu"
+               role="button"
+               aria-expanded="<%= isReportMenu %>"
+               style="color: white !important;"
+            >
+                <span><i class="fas fa-shopping-cart me-2"></i>Reports</span>
+                <i class="fas fa-chevron-down"></i>
             </a>
+            <div class="collapse <%= isReportMenu ? "show" : "" %>" id="reportMenu">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
+                    <% if ("admin".equals(userRole)) { %>
+                        <li>
+                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
+                               href="${pageContext.request.contextPath}/src/pages/reports-daily-sales.jsp"><i class="fas fa-paint-brush me-2"></i>
+                                Daily Sales
+                            </a>
+                        </li>
+                    <% } %>
+
+
+                    <% if (Arrays.asList("admin", "cashier").contains(userRole)) { %>
+                        <li>
+                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
+                               href="${pageContext.request.contextPath}/report?report_type=cashier_daily_sales"><i class="fas fa-paint-brush me-2"></i>
+                                Cashier Daily Sales
+                            </a>
+                        </li>
+                    <% } %>
+
+                    <% if ("admin".equals(userRole)) { %>
+                        <li>
+                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-cashier-wise-sales.jsp") ? "active" : "" %>"
+                               href="${pageContext.request.contextPath}/report?report_type=cashier_wise_sales"><i class="fas fa-paint-brush me-2"></i>
+                                Cashier Wise Sales
+                            </a>
+                        </li>
+                    <% } %>
+
+                    <% if (Arrays.asList("admin", "customer").contains(userRole)) { %>
+                        <li>
+                            <a class="nav-link <%= currentPath.contains("/src/pages/product-list.jsp") ? "active" : "" %>"
+                               href="${pageContext.request.contextPath}/report?report_type=customer_purchase"><i class="fas fa-copy me-2"></i>
+                                Customer Purchase
+                            </a>
+                        </li>
+                    <% } %>
+
+                    <% if (Arrays.asList("admin", "store_keeper").contains(userRole)) { %>
+                        <li>
+                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-product-list.jsp") ? "active" : "" %>"
+                               href="${pageContext.request.contextPath}/report?report_type=product_list"><i class="fas fa-copy me-2"></i>
+                                Product List
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-product-qty-list.jsp") ? "active" : "" %>"
+                               href="${pageContext.request.contextPath}/report?report_type=product_qty_list"><i class="fas fa-copy me-2"></i>
+                                Product Stock
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
         </li>
-        <% } %>
+
+
+
+
 
         <li class="nav-item mt-4">
             <a class="nav-link" href="#">
@@ -128,7 +199,7 @@
     </ul>
 
     <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center text-white-50">
-        <small>v2.4.1 © 2025</small>
+        <small>Mithun © 2025</small>
     </div>
 </div>
 

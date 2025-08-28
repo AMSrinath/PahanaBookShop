@@ -1,13 +1,21 @@
+
+
+<%
+    String sessionUserImage = (sessionUser != null && sessionUser.getUserImagePath() != null && !sessionUser.getUserImagePath().isEmpty())
+            ? request.getContextPath() + "/" + sessionUser.getUserImagePath()
+            : request.getContextPath() + "/src/assets/images/user-default.png";
+
+    assert sessionUser != null;%>
+
 <header class="dashboard-header">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center">
-            <!-- Left Side: Title and Toggle -->
             <div class="d-flex align-items-center">
                 <button class="btn mobile-toggle me-3">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div>
-                    <h1 class="mb-0">Dashboard</h1>
+                    <h1 class="mb-0"> <%= pageTitle %></h1>
                 </div>
             </div>
 
@@ -21,14 +29,22 @@
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                        id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" class="rounded-circle me-2"
+                        <img src="<%= sessionUserImage %>" class="rounded-circle me-2"
                              width="40" height="40" alt="User">
-                        <span class="text-dark fw-semibold">Admin</span>
+                        <span class="text-dark fw-semibold"><%= sessionUser.getFirstName() %></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/user?id=<%= user.getId() %>&action=my_account"><i class="fas fa-user me-2"></i>My Account</a></li>
+                        <li>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/user?id=<%= sessionUser.getId() %>&action=my_account">
+                                <i class="fas fa-user me-2"></i>My Account
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        <li>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
+                                 <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

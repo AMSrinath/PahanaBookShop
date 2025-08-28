@@ -80,6 +80,7 @@ public class SaleServlet extends HttpServlet {
             int cashReceived = json.getInt("cashReceived");
             int totalNet = json.getInt("total");
             int taxAmount = json.getInt("taxAmount");
+            String invoiceNo = json.getString("invoiceNo");
             JSONArray itemsArray = json.getJSONArray("saleItems");
 
             List<SaleItemRequest> itemList = new ArrayList<>();
@@ -98,8 +99,6 @@ public class SaleServlet extends HttpServlet {
                 itemList.add(item);
             }
 
-//            double totalNet = CommonUtil.checkDoubleValue(total,0);
-//            double tax = CommonUtil.checkDoubleValue(taxAmount,0);
             SaleRequest saleRequest = new SaleRequest();
             saleRequest.setCashierId(cashierId);
             saleRequest.setCustomerId(customerId);
@@ -108,6 +107,7 @@ public class SaleServlet extends HttpServlet {
             saleRequest.setTotalNet(totalNet);
             saleRequest.setTaxAmount(taxAmount);
             saleRequest.setSaleItems(itemList);
+            saleRequest.setInvoiceNo(invoiceNo);
 
             try {
                 CommonResponse<String> saleData = SaleDao.getInstance().createSale(saleRequest);

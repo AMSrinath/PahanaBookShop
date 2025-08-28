@@ -19,7 +19,7 @@
         <div class="container-fluid">
             <div class="action-header">
                 <button id="" class="btn btn-primary">
-                    <a href="${pageContext.request.contextPath}/user?type=user&action=list">
+                    <a href="${pageContext.request.contextPath}/author">
                         <i class="fas fa-arrow-left me-2"></i>Back to Author List</span>
                     </a>
                 </button>

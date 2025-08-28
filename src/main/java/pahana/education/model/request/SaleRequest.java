@@ -9,6 +9,7 @@ public class SaleRequest {
     private double totalGross;
     private double totalNet;
     private double taxAmount;
+    private String invoiceNo;
     private List<SaleItemRequest> saleItems;
 
     public int getCashierId() {
@@ -65,5 +66,13 @@ public class SaleRequest {
 
     public void setTaxAmount(double taxAmount) {
         this.taxAmount = taxAmount;
+    }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public void setInvoiceNo(String invoiceNo) {
+        this.invoiceNo = invoiceNo;
     }
 }

@@ -26,13 +26,8 @@
     <%@ include file="../includes/dashboard-header.jsp" %>
     <div class="view active" id="account-view">
         <div class="container-fluid">
-<%--            <div class="action-header" style="align-content: center">--%>
-<%--                <h2 class="page-title"><i class="fas fa-user-circle me-2"></i>My Account</h2>--%>
-<%--            </div>--%>
-
             <div class="row">
                 <div class="col-md-4">
-                    <!-- Profile Card -->
                     <div class="card profile-card mb-4">
                         <div class="card-body text-center">
                             <div class="profile-image-container mb-3">
@@ -47,36 +42,6 @@
                                 <span class="badge badge-vip">Verified</span>
                             </div>
                             <p class="text-muted">Member since: Jan 15, 2023</p>
-                        </div>
-                    </div>
-
-                    <!-- Security Summary -->
-                    <div class="card security-card mb-4">
-                        <div class="card-header">
-                            <h5><i class="fas fa-shield-alt me-2"></i>Security</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="security-item mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span>Password</span>
-                                    <span class="badge badge-active">Strong</span>
-                                </div>
-                                <small class="text-muted">Last changed: 2 months ago</small>
-                            </div>
-                            <div class="security-item mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span>Two-factor Authentication</span>
-                                    <span class="badge badge-inactive">Disabled</span>
-                                </div>
-                                <small class="text-muted">Add an extra layer of security</small>
-                            </div>
-                            <div class="security-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span>Login Activity</span>
-                                    <button class="btn btn-sm btn-outline-primary">View</button>
-                                </div>
-                                <small class="text-muted">Last login: Today, 10:23 AM</small>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -252,8 +217,6 @@
                             </form>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
