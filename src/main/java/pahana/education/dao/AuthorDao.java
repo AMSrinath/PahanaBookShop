@@ -69,7 +69,7 @@ public class AuthorDao {
         String message = "";
         int totalCount = 0;
         List<AuthorDataResponse> data = null;
-        List<AuthorDataResponse> inventoryTypes = new ArrayList<>();
+        List<AuthorDataResponse> authorList = new ArrayList<>();
 
         try {
             Connection conn = DBConnection.getInstance().getConnection();
@@ -81,24 +81,24 @@ public class AuthorDao {
             countRs.close();
             countStmt.close();
 
-
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM author LIMIT ? OFFSET ?");
+            PreparedStatement ps = conn.prepareStatement("SELECT id, first_name, last_name, date_of_birth, " +
+                    "phone_no,gender,email, is_deleted FROM author where is_deleted = 0 LIMIT ? OFFSET ?");
             ps.setInt(1, limit);
             ps.setInt(2, offset);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 AuthorDataResponse  mappedData = AuthorMapper.authorDataResponse(rs);
-                inventoryTypes.add(mappedData);
+                authorList.add(mappedData);
             }
 
             statusCode = HttpStatusEnum.OK.getCode();
-            message = "Author created successfully";
-            data = inventoryTypes;
+            message = "Author data fetch successfully";
+            data = authorList;
 
         } catch (Exception e) {
             e.printStackTrace();
             statusCode = HttpStatusEnum.INTERNAL_SERVER_ERROR.getCode();
-            message = "An error occurred while creating author.";
+            message = "An error occurred while author data fetch.";
         }
 
         return new CommonResponse<>(statusCode, message, data, totalCount);

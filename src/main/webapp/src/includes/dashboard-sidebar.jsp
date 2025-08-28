@@ -82,20 +82,27 @@
             </a>
             <div class="collapse <%= isUserMenu ? "show" : "" %>" id="userMenu">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-3">
+                    <% if ("admin".equals(userRole)) { %>
                     <li>
-                        <a class="nav-link"
-                           href="${pageContext.request.contextPath}/user?id=<%= user.getId() %>&action=my_account"
-                        >
+                        <a class="nav-link <%= currentPath.contains("/user") ? "active" : "" %>"
+                           href="${pageContext.request.contextPath}/user?type=user"><i class="fas fa-user-tie me-2"></i>User</a>
+                    </li>
+                    <% } %>
+
+                    <% if ("admin".equals(userRole)) { %>
+                    <li>
+                        <a class="nav-link <%= currentPath.contains("/src/pages/author-list.jsp") ? "active" : "" %>"
+                           href="${pageContext.request.contextPath}/author"><i class="fas fa-user-tie me-2"></i>Author</a>
+                    </li>
+                    <% } %>
+
+                    <li>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/user?id=<%= user.getId() %>&action=my_account">
                             <i class="fas fa-user-friends me-2"></i>My Account
                         </a>
                     </li>
 
-                    <% if ("admin".equals(userRole)) { %>
-                        <li>
-                            <a class="nav-link <%= currentPath.contains("/user") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/user?type=user"><i class="fas fa-user-tie me-2"></i>User</a>
-                        </li>
-                    <% } %>
+
                 </ul>
             </div>
         </li>
