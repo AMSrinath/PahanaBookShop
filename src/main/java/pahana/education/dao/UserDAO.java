@@ -269,7 +269,6 @@ public class UserDAO {
 
             ps.setString(1, userRequest.getFirstName());
             ps.setString(2, userRequest.getLastName());
-//            ps.setString(3, userRequest.getDateOfBirth().toString());
             ps.setDate(3, java.sql.Date.valueOf(userRequest.getDateOfBirth()));
             ps.setString(4, userRequest.getPhoneNo());
             ps.setString(5, userRequest.getGender().toString());

@@ -16,7 +16,8 @@ public class AuthorMapper {
                 resultSet.getString("phone_no"),
                 Gender.valueOf(resultSet.getString("gender").toUpperCase()),
                 resultSet.getString("email"),
-                resultSet.getBoolean("is_deleted")
+                resultSet.getBoolean("is_deleted"),
+                resultSet.getString("title")
         );
     }
 }

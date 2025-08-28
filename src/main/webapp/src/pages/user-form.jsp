@@ -32,7 +32,7 @@
 
             <div class="custom-form-view">
                 <div class="form-header">
-                    <h2 id="form-title"><i class="fas fa-user-plus me-2"></i>Add New user</h2>
+                    <h2 id="form-title"><i class="fas fa-user-plus me-2"></i>Add New User</h2>
                     <div class="form-buttons">
                         <% if (!isPasswordHide) { %>
                         <button type="button" class="btn btn-outline-secondary" id="clear-btn">

@@ -57,7 +57,7 @@ public class AuthorServlet extends HttpServlet {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }else {
+        } else {
             int page = 1;
             int pageSize = 5;
             String pageParam = request.getParameter("page");
@@ -90,15 +90,63 @@ public class AuthorServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        String jsonResponse = "";
+
+        String action = request.getParameter("action");
+        JSONObject json = CommonUtil.getJsonData(request);
+
+        String userTitle = json.getString("userTitle");
+        String userId = json.getString("userId");
+        String firstName = json.getString("firstName");
+        String lastName = json.getString("lastName");
+        String phoneNo = json.getString("phoneNo");
+        String email = json.getString("email");
+        String dateOfBirth = json.getString("dateOfBirth");
+        String gender = json.getString("gender");
+
+        LocalDate dob = null;
+        if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+            dob = LocalDate.parse(dateOfBirth);
+        }
+
+        UserRequest usrRequest = new UserRequest();
+        usrRequest.setFirstName(firstName);
+        usrRequest.setTitle(userTitle);
+        usrRequest.setLastName(lastName);
+        usrRequest.setPhoneNo(phoneNo);
+        usrRequest.setEmail(email);
+        usrRequest.setDateOfBirth(dob);
+        usrRequest.setGender(Gender.valueOf(gender.toUpperCase()));
+
+        try {
+            CommonResponse<String> authorData;
+            if (userId != null && !userId.isEmpty()) {
+                int id = Integer.parseInt(userId);
+                usrRequest.setUserId(id);
+                authorData = AuthorDao.getInstance().updateAuthor(usrRequest);
+            } else {
+                authorData = AuthorDao.getInstance().createAuthor(usrRequest);
+            }
+
+            jsonResponse = CommonResponseUtil.getJsonResponse(authorData);
+            out.write(jsonResponse);
+            out.flush();
+            out.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         String jsonResponse = "";
-        JSONObject json =  CommonUtil.getJsonData(request);
+        JSONObject json = CommonUtil.getJsonData(request);
 
-        String userId =json.getString("userId");
+        String userId = json.getString("userId");
 
         try {
             CommonResponse<String> returnData;
@@ -116,7 +164,7 @@ public class AuthorServlet extends HttpServlet {
         }
     }
 
-//    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    //    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 //        String idParam = request.getParameter("id");
 //        String action = request.getParameter("action");
 //        CommonResponse<List<AuthorDataResponse>> authorDataResponses = null;

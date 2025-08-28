@@ -13,9 +13,10 @@ public class AuthorDataResponse {
     private Gender  gender;
     private String email;
     private boolean isActive;
+    private String title;
 
     public AuthorDataResponse(int id,String firstName, String lastName, LocalDate dateOfBirth,
-                              String phoneNo, Gender gender, String email,boolean isActive) {
+                              String phoneNo, Gender gender, String email,boolean isActive, String title) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -24,6 +25,7 @@ public class AuthorDataResponse {
         this.gender = gender;
         this.email = email;
         this.isActive = isActive;
+        this.title = title;
     }
 
     public int getId() {
@@ -92,5 +94,13 @@ public class AuthorDataResponse {
 
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

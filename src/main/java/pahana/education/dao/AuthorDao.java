@@ -1,5 +1,8 @@
 package pahana.education.dao;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import jakarta.servlet.ServletException;
+import pahana.education.model.request.UserRequest;
 import pahana.education.model.response.AuthorDataResponse;
 import pahana.education.model.response.CommonResponse;
 import pahana.education.model.response.InventoryTypeResponse;
@@ -8,10 +11,7 @@ import pahana.education.util.enums.HttpStatusEnum;
 import pahana.education.util.mappers.AuthorMapper;
 import pahana.education.util.mappers.InventoryTypeMapper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +53,8 @@ public class AuthorDao {
         AuthorDataResponse data = null;
 
         Connection conn = DBConnection.getInstance().getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM author WHERE id = ?");
+        PreparedStatement ps = conn.prepareStatement("SELECT id, first_name, last_name, date_of_birth, " +
+                "phone_no,gender,email, is_deleted, title FROM author where id = ?");
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
 
@@ -82,7 +83,7 @@ public class AuthorDao {
             countStmt.close();
 
             PreparedStatement ps = conn.prepareStatement("SELECT id, first_name, last_name, date_of_birth, " +
-                    "phone_no,gender,email, is_deleted FROM author where is_deleted = 0 LIMIT ? OFFSET ?");
+                    "phone_no,gender,email, is_deleted, title FROM author where is_deleted = 0 LIMIT ? OFFSET ?");
             ps.setInt(1, limit);
             ps.setInt(2, offset);
             ResultSet rs = ps.executeQuery();
@@ -102,6 +103,93 @@ public class AuthorDao {
         }
 
         return new CommonResponse<>(statusCode, message, data, totalCount);
+    }
+
+    public CommonResponse<String> createAuthor(UserRequest userRequest) throws SQLException {
+        Connection conn = DBConnection.getInstance().getConnection();
+        try {
+            conn.setAutoCommit(false);
+
+            String invSql = "INSERT INTO author (first_name, last_name, date_of_birth, phone_no, gender, email, title)  " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement usrStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
+            usrStmt.setString(1, userRequest.getFirstName());
+            usrStmt.setString(2, userRequest.getLastName());
+            if (userRequest.getDateOfBirth() != null) {
+                usrStmt.setDate(3, java.sql.Date.valueOf(userRequest.getDateOfBirth()));
+            } else {
+                usrStmt.setNull(3, java.sql.Types.DATE);
+            }
+            usrStmt.setString(4, userRequest.getPhoneNo());
+            usrStmt.setString(5, userRequest.getGender().toString());
+            usrStmt.setString(6, userRequest.getEmail());
+            usrStmt.setString(7, userRequest.getTitle());
+            int authCount = usrStmt.executeUpdate();
+
+            if (authCount == 0) {
+                throw new SQLException("Author create failed, no rows affected.");
+            }
+
+            conn.commit();
+            return new CommonResponse<>(200, "Author create successfully", null);
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            return new CommonResponse<>(500, "Error author create: " + e.getMessage(), null);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public CommonResponse<String> updateAuthor(UserRequest userRequest) throws SQLException, ServletException {
+        Connection conn = DBConnection.getInstance().getConnection();
+
+        try{
+            conn.setAutoCommit(false);
+            String sql = "UPDATE author SET first_name = ?, last_name = ?, date_of_birth = ?, phone_no = ?, gender = ?, email = ?, title = ? WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, userRequest.getFirstName());
+            ps.setString(2, userRequest.getLastName());
+            ps.setDate(3, java.sql.Date.valueOf(userRequest.getDateOfBirth()));
+            ps.setString(4, userRequest.getPhoneNo());
+            ps.setString(5, userRequest.getGender().toString());
+            ps.setString(6, userRequest.getEmail());
+            ps.setString(7, userRequest.getTitle());
+            ps.setInt(8, userRequest.getUserId());
+            ps.executeUpdate();
+
+            conn.commit();
+            return new CommonResponse<>(200, "Author details updated", null);
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // rollback only works if auto-commit is false
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            return new CommonResponse<>(500, "Error updating author details: " + e.getMessage(), null);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 

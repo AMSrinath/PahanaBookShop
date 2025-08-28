@@ -44,8 +44,6 @@
                         </div>
                     </div>
 
-                    <p><%= authorList %></p>
-
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead>
@@ -59,7 +57,6 @@
                             </thead>
                             <tbody id="customerTableBody">
                             <%
-//                                List<AuthorDataResponse> authorList = (List<AuthorDataResponse>) request.getAttribute("authorList");
                                 if (authorList != null) {
                                     for (int i = 0; i < authorList.size(); i++) {
                                         AuthorDataResponse author = authorList.get(i);
