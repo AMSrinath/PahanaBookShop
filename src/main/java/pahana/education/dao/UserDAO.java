@@ -200,7 +200,11 @@ public class UserDAO {
             PreparedStatement usrStmt = conn.prepareStatement(invSql, Statement.RETURN_GENERATED_KEYS);
             usrStmt.setString(1, userRequest.getFirstName());
             usrStmt.setString(2, userRequest.getLastName());
-            usrStmt.setString(3, userRequest.getDateOfBirth().toString());
+            if (userRequest.getDateOfBirth() != null) {
+                usrStmt.setDate(3, java.sql.Date.valueOf(userRequest.getDateOfBirth()));
+            } else {
+                usrStmt.setNull(3, java.sql.Types.DATE);
+            }
             usrStmt.setString(4, userRequest.getPhoneNo());
             usrStmt.setString(5, userRequest.getGender().toString());
             usrStmt.setString(6, userRequest.getAddress());
@@ -260,22 +264,21 @@ public class UserDAO {
         try{
             conn.setAutoCommit(false);
             String sql = "UPDATE user SET first_name = ?, last_name = ?, date_of_birth = ?, phone_no = ?, gender = ?, address = ?,user_image_path = ?," +
-                    "password = ?,account_no = ?,email = ?, title = ? WHERE id = ?";
+                    "account_no = ?,email = ?, title = ? WHERE id = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
+
             ps.setString(1, userRequest.getFirstName());
             ps.setString(2, userRequest.getLastName());
-            ps.setString(3, userRequest.getDateOfBirth().toString());
+//            ps.setString(3, userRequest.getDateOfBirth().toString());
+            ps.setDate(3, java.sql.Date.valueOf(userRequest.getDateOfBirth()));
             ps.setString(4, userRequest.getPhoneNo());
             ps.setString(5, userRequest.getGender().toString());
             ps.setString(6, userRequest.getAddress());
             ps.setString(7, userRequest.getUserImagePath());
-
-            String hashedPassword = BCrypt.withDefaults().hashToString(12, userRequest.getPassword().toCharArray());
-            ps.setString(8, hashedPassword);
-            ps.setString(9, userRequest.getAccountNo());
-            ps.setString(10, userRequest.getEmail());
-            ps.setString(11, userRequest.getTitle());
-            ps.setInt(12, userRequest.getUserId());
+            ps.setString(8, userRequest.getAccountNo());
+            ps.setString(9, userRequest.getEmail());
+            ps.setString(10, userRequest.getTitle());
+            ps.setInt(11, userRequest.getUserId());
             ps.executeUpdate();
 
             String priceSql = "UPDATE user_role SET user_id =? , role_id = ? WHERE id = ?";
@@ -286,7 +289,7 @@ public class UserDAO {
             priceStmt.executeUpdate();
 
             conn.commit();
-            return new CommonResponse<>(200, "Product created successfully", null);
+            return new CommonResponse<>(200, "User details updated", null);
 
         } catch (SQLException e) {
             try {
@@ -294,7 +297,7 @@ public class UserDAO {
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }
-            return new CommonResponse<>(500, "Error creating product: " + e.getMessage(), null);
+            return new CommonResponse<>(500, "Error updating user details: " + e.getMessage(), null);
         } finally {
             if (conn != null) {
                 try {

@@ -83,11 +83,12 @@
                             window.location.href = "<%= request.getContextPath() %>/src/pages/dashboard.jsp";
                         }, 2000);
                     } else {
+                        $("#spinner-overlay").hide();
                         showToast(response.message || "Something went wrong", "error");
                     }
                 },
                 error: function (xhr) {
-                    console.log("Response333:", xhr);
+                    $("#spinner-overlay").hide();
                     showToast("Request failed: ","error");
                 }
             });

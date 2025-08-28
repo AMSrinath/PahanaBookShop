@@ -1,10 +1,4 @@
-<%@ page import="pahana.education.model.response.UserDataResponse" %><%
-    int userId = 0;
-    UserDataResponse user = (UserDataResponse) session.getAttribute("user");
-    if (user != null) {
-        userId = user.getId();
-    }
-%>
+<%@ page import="pahana.education.model.response.UserDataResponse" %>
 
 
 <% String pageTitle = "POS System"; %>

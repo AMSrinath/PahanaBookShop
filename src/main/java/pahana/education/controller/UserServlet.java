@@ -45,16 +45,26 @@ public class UserServlet extends HttpServlet {
 
                 int id = Integer.parseInt(idParam);
                 CommonResponse<UserDataResponse> userData = UserDAO.getInstance().getUserById(id);
-                if (userData.getData() != null) {
-                    request.setAttribute("userRoleList", userRoles);
-                    request.setAttribute("userData", userData.getData());
-                    request.getRequestDispatcher("/src/pages/user-form.jsp").forward(request, response);
-                    return;
+                if ("my_account".equalsIgnoreCase(action)){
+                    if (userData.getData() != null) {
+                        request.setAttribute("userRoleList", userRoles);
+                        request.setAttribute("userData", userData.getData());
+                        request.getRequestDispatcher("/src/pages/my-account.jsp").forward(request, response);
+                        return;
+                    }
                 } else {
-                    request.setAttribute("errorMessage", "user not found");
-                    request.getRequestDispatcher("/src/pages/user-list.jsp").forward(request, response);
-                    return;
+                    if (userData.getData() != null) {
+                        request.setAttribute("userRoleList", userRoles);
+                        request.setAttribute("userData", userData.getData());
+                        request.getRequestDispatcher("/src/pages/user-form.jsp").forward(request, response);
+                        return;
+                    } else {
+                        request.setAttribute("errorMessage", "user not found");
+                        request.getRequestDispatcher("/src/pages/user-list.jsp").forward(request, response);
+                        return;
+                    }
                 }
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -113,6 +123,7 @@ public class UserServlet extends HttpServlet {
         JSONObject json =  CommonUtil.getJsonData(request);
 
         String productImagePath = "";
+        String userTitle = json.getString("userTitle");
         String userId = json.getString("userId");
         String roleId = json.getString("userRoleId");
         String firstName = json.getString("firstName");
@@ -140,10 +151,13 @@ public class UserServlet extends HttpServlet {
 
         UserRequest usrRequest = new UserRequest();
         usrRequest.setFirstName(firstName);
+        usrRequest.setTitle(userTitle);
         usrRequest.setLastName(lastName);
         usrRequest.setPhoneNo(phoneNo);
         usrRequest.setEmail(email);
-        usrRequest.setPassword(password);
+        if (password != null && !password.isEmpty()) {
+            usrRequest.setPassword(password);
+        }
         usrRequest.setDateOfBirth(dob);
         usrRequest.setGender(Gender.valueOf(gender.toUpperCase()));
         usrRequest.setAddress(address);

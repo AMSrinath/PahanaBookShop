@@ -13,7 +13,6 @@
             ? baseUrl + "/" + userResponse.getUserImagePath()
             : baseUrl + "/src/assets/images/default.jpg";
 %>
-%>
 
 
 <%@ include file="../includes/header.jsp" %>
@@ -35,9 +34,11 @@
                 <div class="form-header">
                     <h2 id="form-title"><i class="fas fa-user-plus me-2"></i>Add New user</h2>
                     <div class="form-buttons">
+                        <% if (!isPasswordHide) { %>
                         <button type="button" class="btn btn-outline-secondary" id="clear-btn">
                             Clear
                         </button>
+                        <% } %>
                         <button type="button" class="btn btn-primary" id="save-btn">
                             <i class="fas fa-plus me-2"></i>Save
                         </button>
@@ -51,7 +52,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Title</label>
-                            <select name="title" class="form-select" id="title" >
+                            <select name="userTitle" class="form-select" id="title" >
                                 <option value="">-- Select Inventory Type --</option>
                                 <option value="Mr." <%= (userResponse != null && "Mr.".equalsIgnoreCase(userResponse.getTitle())) ? "selected" : "" %>>Mr.</option>
                                 <option value="Mrs." <%= (userResponse != null && "Mrs.".equalsIgnoreCase(userResponse.getTitle())) ? "selected" : "" %>>Mrs.</option>
@@ -144,7 +145,7 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Product Image</label>
+                            <label class="form-label">User Image</label>
                             <div class="image-upload-container">
                                 <div class="image-preview-form mb-3" id="imagePreview">
                                     <img id="previewImage" src="<%= imagePath%>" />
@@ -168,7 +169,7 @@
 <%@ include file="../includes/toast-message.jsp" %>
 
 <script>
-    const isPasswordShowHide = '<%= isPasswordHide %>';
+    const isPasswordShowHide = <%= isPasswordHide %>;
     if (!isPasswordShowHide) {
         document.getElementById("togglePassword").addEventListener("click", function () {
             const passwordField = document.getElementById("password");
@@ -205,7 +206,6 @@
 
     $(document).ready(function () {
         let base64ImageData = "";
-        let typeName = "";
         const idParam = '<%= (idParam != null) ? idParam : "" %>';
 
         if (idParam) {
@@ -213,16 +213,23 @@
             $('#save-btn').html('<i class="fas fa-save me-2"></i>Update');
         }
 
-        document.getElementById("imageFile").addEventListener("change", function () {
+        const previewSrc = $("#previewImage").attr("src");
+
+        if (previewSrc && !previewSrc.startsWith("data:image") && !previewSrc.includes("default.jpg")) {
+            convertImageToBase64(previewSrc, function (base64) {
+                base64ImageData = base64;
+            });
+        }
+
+        $("#imageFile").on("change", function () {
             const file = this.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function (e) {
                 base64ImageData = e.target.result;
-                document.getElementById("previewImage").src = base64ImageData;
+                $("#previewImage").attr("src", base64ImageData);
             };
-
             reader.readAsDataURL(file);
         });
 
@@ -230,14 +237,16 @@
             if (!validateForm()) {
                 return;
             }
+
             const newFormData = {
                 userId: $('[name="userId"]').val().trim(),
+                userTitle: $('[name="userTitle"]').val(),
                 userRoleId: $('[name="userRoleId"]').val().trim(),
                 firstName: $('[name="firstName"]').val().trim(),
                 lastName: $('[name="lastName"]').val().trim(),
                 phoneNo: $('[name="phoneNo"]').val().trim(),
                 email: $('[name="email"]').val().trim(),
-                password: $('[name="password"]').val().trim(),
+                password: (isPasswordShowHide === true) ? "" : $('[name="password"]').val().trim(),
                 dateOfBirth: $('[name="dateOfBirth"]').val(),
                 gender: $('[name="gender"]').val(),
                 address: $('[name="address"]').val().trim(),
@@ -245,6 +254,7 @@
                 accountNo: $('[name="accountNo"]').val().trim(),
                 userImage: base64ImageData,
             };
+
             $.ajax({
                 url: "<%= request.getContextPath() %>/user",
                 type: "POST",
@@ -269,7 +279,7 @@
     });
 
     $("#clear-btn").click(function() {
-        $("#productForm")[0].reset();
+        $("#customerForm")[0].reset();
         $("#previewImage").attr("src", "").hide();
         $(".fa-image").show();
     });
@@ -310,11 +320,29 @@
     });
 
 
+    function convertImageToBase64(imageUrl, callback) {
+        fetch(imageUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    callback(reader.result);
+                };
+                reader.readAsDataURL(blob);
+            })
+            .catch(error => {
+                console.error("Failed to convert image to base64:", error);
+                callback(""); // fallback if fetch fails
+            });
+    }
+
     function validateForm() {
         const firstName = $('[name="firstName"]').val().trim();
         const lastName = $('[name="lastName"]').val().trim();
         const phoneNo = $('[name="phoneNo"]').val().trim();
         const email = $('[name="email"]').val().trim();
+        const gender = $('[name="gender"]').val();
+        const dateOfBirth = $('[name="dateOfBirth"]').val();
         const selectedText = $('#customerTypeId option:selected').text().trim().toLowerCase();
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -348,6 +376,16 @@
             return false;
         } else if (!emailRegex.test(email)) {
             showToast("Please enter a valid email address", "error");
+            return false;
+        }
+
+        if (!gender) {
+            showToast("Please select gender ", "error");
+            return false;
+        }
+
+        if (!dateOfBirth) {
+            showToast("Please add the date of birth ", "error");
             return false;
         }
 
