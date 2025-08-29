@@ -1,15 +1,16 @@
 package pahana.education.dao;
 
-import pahana.education.model.response.CommonResponse;
-import pahana.education.model.response.DashBoardResponse;
-import pahana.education.model.response.InventoryResponse;
+import pahana.education.model.response.*;
 import pahana.education.util.DBConnection;
+import pahana.education.util.DateUtil;
 import pahana.education.util.mappers.InventoryMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashboardDao {
     private static DashboardDao instance;
@@ -101,6 +102,62 @@ public class DashboardDao {
             lastMonth = saleMonthRs.getDouble("last_month_total");
         }
 
+
+        List<CustomerList> customerLists = new ArrayList<>();
+        PreparedStatement customerListSql = conn.prepareStatement("select u.first_name as firstName," +
+                " u.last_name as lastName, u.email, u.phone_no as phone, u.user_image_path as userImage, u.created_at as joinDate  \n" +
+                "from user u  \n" +
+                "left join user_role ur on ur.user_id = u.id \n" +
+                "where u.is_deleted = 0 and ur.role_id =3 limit 6");
+        ResultSet customerListRs = customerListSql.executeQuery();
+        while (customerListRs.next()) {
+            CustomerList cl = new CustomerList();
+            cl.setFirstName(customerListRs.getString("firstName"));
+            cl.setLastName(customerListRs.getString("lastName"));
+            cl.setEmail(customerListRs.getString("email"));
+            cl.setPhone(customerListRs.getString("phone"));
+            cl.setUserImage(customerListRs.getString("userImage"));
+            cl.setJoinedDate(DateUtil.formatDate(customerListRs.getString("joinDate")));
+            customerLists.add(cl);
+        }
+
+        /* ****************************************************************************************************************/
+        List<RecentSalesInfo> recentSalesInfo = new ArrayList<>();
+        PreparedStatement invoiceSql = conn.prepareStatement("select si.invoice_date as invoiceDate, si.is_deleted as status, si.invoice_no as invoiceNo,  u.first_name as customerFName ,\n" +
+                "u.last_name as customerLName, u.email, u.phone_no, si.is_deleted as status  from sales_invoice si \n" +
+                "left join user u on si.cashier_id = u.id\n" +
+                "where si.is_deleted =0 limit 6");
+
+        ResultSet invoiceRs = invoiceSql.executeQuery();
+        while (invoiceRs.next()) {
+            RecentSalesInfo pl = new RecentSalesInfo();
+            pl.setInvoiceNo(invoiceRs.getString("invoiceNo"));
+            pl.setStatus(invoiceRs.getBoolean("status"));
+            pl.setCustomerFName(invoiceRs.getString("customerFName"));
+            pl.setCustomerLName(invoiceRs.getString("customerLName"));
+            pl.setInvoiceDate(DateUtil.formatDate(invoiceRs.getString("invoiceDate")));
+            recentSalesInfo.add(pl);
+        }
+
+        /* ****************************************************************************************************************/
+        List<ProductList> productLists = new ArrayList<>();
+        PreparedStatement itemListSql = conn.prepareStatement("select i.name as itemName, i.default_image as itemImage,  \n" +
+                " pl.retail_price as sellPrice, pl.qty_hand as qty, i.created_at as createDate  from inventory i \n" +
+                "left join price_list pl on pl.inventory_id = i.id \n" +
+                "where i.is_deleted = 0 limit 6");
+
+        ResultSet itemListRs = itemListSql.executeQuery();
+        while (itemListRs.next()) {
+            ProductList pl = new ProductList();
+            pl.setItemName(itemListRs.getString("itemName"));
+            pl.setItemImage(itemListRs.getString("itemImage"));
+            pl.setSalePrice(itemListRs.getDouble("sellPrice"));
+            pl.setQty(itemListRs.getInt("qty"));
+            pl.setAddDate(DateUtil.formatDate(itemListRs.getString("createDate")));
+            productLists.add(pl);
+        }
+
+
         DashBoardResponse db = new DashBoardResponse();
         db.setSaleCount(saleCount);
         db.setInventoryCount(inventoryCount);
@@ -112,6 +169,9 @@ public class DashboardDao {
         db.setStockValue(stockValue);
         db.setCurrentMonth(currentMonth);
         db.setLastMonth(lastMonth);
+        db.setCustomerList(customerLists);
+        db.setItemsList(productLists);
+        db.setRecentSalesInfoList(recentSalesInfo);
         data = db;
 
         return new CommonResponse<>(statusCode, message, data);

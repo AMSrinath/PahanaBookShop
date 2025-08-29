@@ -1,5 +1,7 @@
 package pahana.education.model.response;
 
+import java.util.List;
+
 public class DashBoardResponse {
     private int saleCount = 0;
     private int inventoryCount = 0;
@@ -11,6 +13,9 @@ public class DashBoardResponse {
     private double stockValue =0.00;
     private double currentMonth =0.00;
     private double lastMonth =0.00;
+    private List<CustomerList> customerList;
+    private List<ProductList> itemsList;
+    private List<RecentSalesInfo> recentSalesInfoList;
 
 
     public int getSaleCount() {
@@ -91,6 +96,30 @@ public class DashBoardResponse {
 
     public void setLastMonth(double lastMonth) {
         this.lastMonth = lastMonth;
+    }
+
+    public List<CustomerList> getCustomerList() {
+        return customerList;
+    }
+
+    public void setCustomerList(List<CustomerList> customerList) {
+        this.customerList = customerList;
+    }
+
+    public List<ProductList> getItemsList() {
+        return itemsList;
+    }
+
+    public void setItemsList(List<ProductList> itemsList) {
+        this.itemsList = itemsList;
+    }
+
+    public List<RecentSalesInfo> getRecentSalesInfoList() {
+        return recentSalesInfoList;
+    }
+
+    public void setRecentSalesInfoList(List<RecentSalesInfo> recentSalesInfoList) {
+        this.recentSalesInfoList = recentSalesInfoList;
     }
 }
 

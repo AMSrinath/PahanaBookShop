@@ -15,7 +15,6 @@
 
 <div class="sidebar">
     <div class="sidebar-brand">
-<%--        <h3><i class="fas fa-chart-line me-2"></i>Pahana Book</h3>--%>
         <h3><i class="fa-solid fa-book-bookmark"></i> Pahana Book</h3>
         <h3 style="align-content: center">Shop</h3>
     </div>
@@ -203,24 +202,3 @@
         <small style="color: white !important;">Mithun © 2025</small>
     </div>
 </div>
-
-<%--<script>--%>
-<%--    document.addEventListener("DOMContentLoaded", function () {--%>
-<%--        const userData = JSON.parse(localStorage.getItem("user"));--%>
-
-<%--        if (!userData || !userData.role) {--%>
-<%--            window.location.href = "/index";--%>
-<%--            return;--%>
-<%--        }--%>
-
-<%--        const role = userData.role;--%>
-<%--        usersMenuItem.style.display = "none";--%>
-
-<%--        if (role == "admin" || role == 'customer') {--%>
-<%--            const usersMenuItem = document.getElementById("usersMenuItem");--%>
-<%--            if (usersMenuItem) {--%>
-<%--                usersMenuItem.style.display = "block";--%>
-<%--            }--%>
-<%--        }--%>
-<%--    });--%>
-<%--</script>--%>

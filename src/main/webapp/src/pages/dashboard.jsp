@@ -1,4 +1,5 @@
-<%@ page import="pahana.education.model.response.DashBoardResponse" %>
+<%@ page import="java.util.List" %>
+<%@ page import="pahana.education.model.response.*" %>
 <%
     String pageTitle = "Dashboard";
     DashBoardResponse dashboardData = null;
@@ -87,6 +88,28 @@
         align-items: center;
         font-size: 18px;
     }
+
+    .item-avatar {
+        width: 80px;
+        height: 100px;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .status-completed {
+        background: #e6f4ee;
+        color: var(--success1);
+    }
 </style>
 
 <div class="main-content">
@@ -97,7 +120,7 @@
             <div class="row">
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #e74a3b">
                             <i class="fas fa-receipt"></i>
                         </div>
                         <h5>Sales Count</h5>
@@ -107,7 +130,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #4895ef">
                             <i class="fas fa-sack-dollar"></i>
                         </div>
                         <h5>Total Sales</h5>
@@ -117,7 +140,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #bb09fa;">
                             <i class="fas fa-calendar-minus"></i>
                         </div>
                         <h5>Lash Month Sales</h5>
@@ -127,7 +150,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #bb09fa;">
                             <i class="fas fa-calendar-check"></i>
                         </div>
                         <h5>Current Monthly Sales</h5>
@@ -136,8 +159,8 @@
                 </div>
 
                 <div class="col-md-3 col-sm-6">
-                    <div class="card stat-card">
-                        <div class="icon">
+                    <div class="card stat-card ">
+                        <div class="icon" style="color: #1cc88a">
                             <i class="fas fa-users"></i>
                         </div>
                         <h5>Users count</h5>
@@ -147,7 +170,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #1cc88a">
                             <i class="fas fa-user-tag"></i>
                         </div>
                         <h5>Customer count</h5>
@@ -157,7 +180,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #36b9cc">
                             <i class="fas fa-box-open"></i>
                         </div>
                         <h5>Items count</h5>
@@ -167,7 +190,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #f6c23e">
                             <i class="fas fa-warehouse"></i>
                         </div>
                         <h5>Stock count</h5>
@@ -177,7 +200,7 @@
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
-                        <div class="icon">
+                        <div class="icon" style="color: #f6c23e">
                             <i class="fas fa-coins"></i>
                         </div>
                         <h5>Total Stock</h5>
@@ -187,62 +210,145 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-4">
-                    <!-- Recent Users -->
-                    <div class="card">
+                <!-- Recent Transactions -->
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Recent Transactions</h6>
+                            <a href="#" class="btn btn-sm btn-primary">View All</a>
+                        </div>
                         <div class="card-body">
-                            <h4 class="card-title">Customers</h4>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 6.2%</span>
-                                    <span>Total Likes</span>
-                                </div>
-                                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
-                            </div>
+                            <div class="recent-table">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Invoice No</th>
+                                            <th scope="col">Customer</th>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
 
-                            <div class="card user-card">
-                                <div class="user-avatar">IC</div>
-                                <div>
-                                    <h5 class="mb-1">Isabella Christensen</h5>
-                                    <p class="mb-0 text-muted small">Lorem Ipsum is simply dummy text of...</p>
-                                </div>
-                            </div>
+                                        <%
+                                            List<RecentSalesInfo> recentSalesInfos = dashboardData.getRecentSalesInfoList();
+                                            if (recentSalesInfos != null) {
+                                                for (int i = 0; i < recentSalesInfos.size(); i++) {
+                                                    RecentSalesInfo item = recentSalesInfos.get(i);
+                                                    assert item != null;%>
 
-                            <div class="card user-card">
-                                <div class="user-avatar"
-                                     style="background: linear-gradient(45deg, #f72585, #7209b7);">JD</div>
-                                <div>
-                                    <h5 class="mb-1">John Doe</h5>
-                                    <p class="mb-0 text-muted small">Recently purchased premium package</p>
-                                </div>
-                            </div>
-
-                            <div class="card user-card">
-                                <div class="user-avatar"
-                                     style="background: linear-gradient(45deg, #4cc9f0, #4895ef);">ES</div>
-                                <div>
-                                    <h5 class="mb-1">Emma Smith</h5>
-                                    <p class="mb-0 text-muted small">Active for 120 days</p>
+                                                <tr>
+                                                    <td>#<%=item.getInvoiceNo() %></td>
+                                                    <td><%=item.getCustomerFullName() %></td>
+                                                    <td><%=item.getInvoiceDate() %></td>
+                                                    <td><span class="status-badge status-completed"><%=!item.isStatus() ? " Complete" : "Failed" %></span></td>
+                                                </tr>
+                                            <% } %>
+                                        <% } %>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Rating -->
-                    <div class="card stat-card">
-                        <div class="icon">
-                            <i class="fas fa-star"></i>
+                <!-- Quick Actions and Inventory Alerts -->
+                <div class="col-xl-4 col-lg-5">
+                    <!-- Quick Actions -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
                         </div>
-                        <h5>Customer Rating</h5>
-                        <h2>4.7 <span class="fs-6 text-warning"><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star-half-alt"></i></span></h2>
-                        <div class="d-flex align-items-center">
-                            <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 12%</span>
-                            <span>vs last month</span>
+                        <div class="card-body">
+                            <div class="quick-actions">
+                                <button class="action-btn">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <span>New Sale</span>
+                                </button>
+                                <button class="action-btn">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Add Customer</span>
+                                </button>
+                                <button class="action-btn">
+                                    <i class="fas fa-box"></i>
+                                    <span>Add Product</span>
+                                </button>
+                                <button class="action-btn">
+                                    <i class="fas fa-file-invoice"></i>
+                                    <span>Generate Report</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-warning" style="width: 94%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-6 col-lg-7">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Recent Customers</h6>
+                        </div>
+                        <div class="card-body">
+                            <%
+                                List<CustomerList> customerLists = dashboardData.getCustomerList();
+                                if (customerLists != null) {
+                                    for (int i = 0; i < customerLists.size(); i++) {
+                                        CustomerList item = customerLists.get(i);
+                                        String imagePath = (item != null && item.getUserImage() != null && !item.getUserImage().isEmpty())
+                                                ? request.getContextPath() + "/" + item.getUserImage()
+                                                : request.getContextPath() + "/src/assets/images/user-default.png";
+                                        assert item != null;%>
+                            <div class="user-card">
+                                <div class="user-avatar" style="background: linear-gradient(45deg, #4cc9f0, #4895ef);">
+                                    <img src="<%= imagePath %>" alt="User Avatar" style="width: 100%; height: 100%; border-radius: 50%;">
+                                </div>
+                                <div>
+                                    <h5 class="mb-1"><%= item.getFullName() %></h5>
+                                    <p class="mb-0 text-muted small">Joined: <%= item.getJoinedDate() %></p>
+                                </div>
+                            </div>
+
+                                <% } %>
+                            <% } %>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Customers -->
+                <div class="col-xl-6 col-lg-5">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Recent Products</h6>
+                        </div>
+                        <div class="card-body">
+                            <%
+                                List<ProductList> productList = dashboardData.getItemsList();
+                                if (productList != null) {
+                                    for (int i = 0; i < productList.size(); i++) {
+                                        ProductList item = productList.get(i);
+                                        String imagePath = (item != null && item.getItemImage() != null && !item.getItemImage().isEmpty())
+                                                ? request.getContextPath() + "/" + item.getItemImage()
+                                                : request.getContextPath() + "/src/assets/images/product-default.jpeg";
+                                        assert item != null;%>
+                            <div class="user-card">
+                                <div class="item-avatar">
+                                    <img src="<%= imagePath %>" alt="User Avatar" style="width: 100%; height: 100%;">
+                                </div>
+                                <div>
+                                    <h5 class="mb-1"><%= item.getItemName() %></h5>
+                                    <p class="mb-0 text-muted small">Rs. <%= item.getSalePrice() %></p>
+                                    <p class="mb-0 text-muted small">Qty. <%= item.getQty() %></p>
+                                    <p class="mb-0 text-muted small">Added: <%= item.getAddDate() %></p>
+                                </div>
+                            </div>
+
+                            <% } %>
+                            <% } %>
+
                         </div>
                     </div>
                 </div>
@@ -255,5 +361,3 @@
 </div>
 
 <%@ include file="../includes/footer.jsp" %>
-
-
