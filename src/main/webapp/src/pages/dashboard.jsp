@@ -55,16 +55,6 @@
         color: #343a40;
     }
 
-    .progress {
-        height: 8px;
-        border-radius: 10px;
-        background-color: #e9ecef;
-    }
-
-    .progress-bar {
-        transition: width 1s ease-in-out;
-    }
-
     .user-card {
         background: #fff;
         padding: 15px;
