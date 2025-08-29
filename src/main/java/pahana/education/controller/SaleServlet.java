@@ -143,9 +143,6 @@ public class SaleServlet extends HttpServlet {
             if (filePart != null && filePart.getSize() > 0) {
                 imagePath = FileUploads.handleFileUpload(request, filePart, UPLOAD_DIR);
             }
-
-            boolean isBarcodeExist = InventoryDao.getInstance().isBarcodeExists(barcode);
-            boolean isbnNoExists = InventoryDao.getInstance().isIsbnNoExists(barcode);
             CommonResponse<InventoryTypeResponse> inventoryTypeByIdData = InventoryDao.getInstance().getInventoryTypeById(inventoryTypeId);
 
             InventoryRequest invRequest = new InventoryRequest();

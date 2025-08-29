@@ -1,29 +1,3 @@
-<%@ page import="java.util.List" %>
-<%@ page import="pahana.education.model.response.*" %>
-<%
-    String pageTitle = "Dashboard";
-    DashBoardResponse dashboardData = null;
-    dashboardData  = (DashBoardResponse) request.getAttribute("dashboardData");
-    if (dashboardData == null) {
-        dashboardData = new DashBoardResponse();
-    }
-
-    double current = dashboardData.getCurrentMonth();
-    double last = dashboardData.getLastMonth();
-    double percentChange = 0;
-    if (last > 0) {
-        percentChange = ((double)(current - last) / last) * 100;
-    } else {
-        percentChange = ((double)(current) / last) * 100;
-    }
-    String progressColor = percentChange >= 0 ? "bg-success" : "bg-danger";
-%>
-
-<%@ include file="../includes/header.jsp" %>
-
-<%@ include file="../includes/dashboard-sidebar.jsp" %>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     .stat-card {
         background: linear-gradient(145deg, #ffffff, #f0f0f0);
@@ -102,11 +76,38 @@
     }
 </style>
 
+<%@ page import="java.util.List" %>
+<%@ page import="pahana.education.model.response.*" %>
+<%
+    String pageTitle = "Dashboard";
+    DashBoardResponse dashboardData = null;
+    dashboardData  = (DashBoardResponse) request.getAttribute("dashboardData");
+    if (dashboardData == null) {
+        dashboardData = new DashBoardResponse();
+    }
+
+    double current = dashboardData.getCurrentMonth();
+    double last = dashboardData.getLastMonth();
+    double percentChange = 0;
+    if (last > 0) {
+        percentChange = ((double)(current - last) / last) * 100;
+    } else {
+        percentChange = ((double)(current) / last) * 100;
+    }
+    String progressColor = percentChange >= 0 ? "bg-success" : "bg-danger";
+%>
+
+<%@ include file="../includes/header.jsp" %>
+
+<%@ include file="../includes/dashboard-sidebar.jsp" %>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
 <div class="main-content">
     <%@ include file="../includes/dashboard-header.jsp" %>
     <div class="view active" id="dashboard-view">
         <div class="container-fluid py-4">
-            <!-- Stats Row 1 -->
             <div class="row">
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
@@ -253,21 +254,22 @@
                         </div>
                         <div class="card-body">
                             <div class="quick-actions">
-                                <button class="action-btn">
+                                <button class="action-btn"
+                                        onclick="window.location.href='${pageContext.request.contextPath}/src/pages/sales.jsp'">
                                     <i class="fas fa-plus-circle"></i>
                                     <span>New Sale</span>
                                 </button>
-                                <button class="action-btn">
+                                <button class="action-btn" onclick="window.location.href='${pageContext.request.contextPath}/user?type=user&action=add_new'">
                                     <i class="fas fa-user-plus"></i>
                                     <span>Add Customer</span>
                                 </button>
-                                <button class="action-btn">
+                                <button class="action-btn" onclick="window.location.href='${pageContext.request.contextPath}/inventory?action=add_new'">
                                     <i class="fas fa-box"></i>
                                     <span>Add Product</span>
                                 </button>
-                                <button class="action-btn">
+                                <button class="action-btn" onclick="window.location.href='${pageContext.request.contextPath}/author'">
                                     <i class="fas fa-file-invoice"></i>
-                                    <span>Generate Report</span>
+                                    <span>Author List</span>
                                 </button>
                             </div>
                         </div>
@@ -343,8 +345,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 

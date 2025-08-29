@@ -179,7 +179,7 @@ public class InventoryDao {
     }
 
 
-    /***************************************************************************************************/
+    /* **************************************************************************************************/
     /** Inventory Business Process */
     public List<InventoryResponse> getAllInventory() throws SQLException {
         List<InventoryResponse> inventory = new ArrayList<>();
@@ -379,7 +379,11 @@ public class InventoryDao {
             ps.setString(2, request.getName());
             ps.setString(3, request.getDefaultImage());
             ps.setInt(4, request.getInventoryTypeId());
-            ps.setInt(5, request.getAuthorId());
+            if (request.getAuthorId() != null) {
+                ps.setInt(5, request.getAuthorId());
+            } else {
+                ps.setNull(5, Types.INTEGER);
+            }
             ps.setString(6, request.getIsbnNo());
             ps.setInt(7, request.getId());
             ps.executeUpdate();
@@ -414,23 +418,29 @@ public class InventoryDao {
         }
     }
 
-    public boolean isBarcodeExists(String barcode) throws SQLException {
+    public CommonResponse<String> isBarcodeExists(String barcode) throws SQLException {
         Connection conn = DBConnection.getInstance().getConnection();
         String sql = "SELECT COUNT(*) FROM inventory WHERE barcode = ?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, barcode);
         ResultSet rs = ps.executeQuery();
 
-        return rs.next() && rs.getInt(1) > 0;
+        if (rs.next() && rs.getInt(1) > 0) {
+            return new CommonResponse<>(409, "Barcode is already exists", null);
+        }
+        return new CommonResponse<>(200, "Barcode Ok", null);
     }
 
-    public boolean isIsbnNoExists(String isbnNo) throws SQLException {
+    public CommonResponse<String> isIsbnNoExists(String isbnNo) throws SQLException {
         Connection conn = DBConnection.getInstance().getConnection();
         String sql = "SELECT COUNT(*) FROM inventory WHERE isbn_no = ?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, isbnNo);
         ResultSet rs = ps.executeQuery();
 
-        return rs.next() && rs.getInt(1) > 0;
+        if (rs.next() && rs.getInt(1) > 0) {
+            return new CommonResponse<>(409, "Isbn.No is already exists", null);
+        }
+        return new CommonResponse<>(200, "Isbn.No Ok", null);
     }
 }

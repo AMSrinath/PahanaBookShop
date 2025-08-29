@@ -151,7 +151,7 @@ public class AuthorServlet extends HttpServlet {
         try {
             CommonResponse<String> returnData;
             int id = Integer.parseInt(userId);
-            CommonResponse<String> deleteResponse = UserDAO.getInstance().deleteUser(id);
+            CommonResponse<String> deleteResponse = AuthorDao.getInstance().deleteUser(id);
             jsonResponse = CommonResponseUtil.getJsonResponse(deleteResponse);
             out.write(jsonResponse);
             out.flush();
@@ -164,63 +164,6 @@ public class AuthorServlet extends HttpServlet {
         }
     }
 
-    //    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-//        String idParam = request.getParameter("id");
-//        String action = request.getParameter("action");
-//        CommonResponse<List<AuthorDataResponse>> authorDataResponses = null;
-//
-//        if ("types".equalsIgnoreCase(action)) {
-//            getAuthorsData(request, response);
-//        }
-//
-//        if (idParam != null && !idParam.isEmpty()) {
-//            try {
-//                int id = Integer.parseInt(idParam);
-//                CommonResponse<AuthorDataResponse> author = AuthorDao.getInstance().getAuthorById(id);
-//                if (author.getData() != null) {
-//                    request.setAttribute("inventoryType", author.getData());
-//                    request.getRequestDispatcher("/src/pages/author-form.jsp").forward(request, response);
-//                } else {
-//                    request.setAttribute("errorMessage", "Inventory type not found");
-//                    request.getRequestDispatcher("/src/pages/author-list.jsp").forward(request, response);
-//                }
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//        } else {
-//            int page = 1;
-//            int pageSize = 5;
-//            String pageParam = request.getParameter("page");
-//            if (pageParam != null) {
-//                try {
-//                    page = Integer.parseInt(pageParam);
-//                    if (page < 1) page = 1;
-//                } catch (NumberFormatException e) {
-//                    page = 1;
-//                }
-//            }
-//
-//            int offset = (page - 1) * pageSize;
-//            try {
-//                authorDataResponses = AuthorDao.getInstance().getAllAuthorPaginate(pageSize, offset);
-//                int totalRecords = authorDataResponses.getTotalCount();
-//                int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-//
-//                request.setAttribute("authorList", authorDataResponses.getData());
-//                request.setAttribute("currentPage", page);
-//                request.setAttribute("totalPages", totalPages);
-//                request.setAttribute("pageSize", pageSize);
-//                request.setAttribute("totalRecords", totalRecords);
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//            request.getRequestDispatcher("/src/pages/author-list.jsp").forward(request, response);
-//        }
-//    }
-//
-//    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-//    }
-//
     private void getAuthorsData(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         response.setContentType("application/json");

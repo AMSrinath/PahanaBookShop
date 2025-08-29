@@ -346,5 +346,22 @@ public class UserDAO {
         }
     }
 
+    public CommonResponse<String> changePassword(String changePassword, int userId) throws SQLException, ServletException {
+        Connection conn = DBConnection.getInstance().getConnection();
+
+        try{
+            String hashedPassword = BCrypt.withDefaults().hashToString(12, changePassword.toCharArray());
+            String sql = "UPDATE user SET password = ? WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, hashedPassword);
+            ps.setInt(2, userId);
+
+            ps.executeUpdate();
+            return new CommonResponse<>(200, "Password Changing successfully", null);
+
+        } catch (SQLException e) {
+            return new CommonResponse<>(500, "Error updating password: " + e.getMessage(), null);
+        }
+    }
 
 }

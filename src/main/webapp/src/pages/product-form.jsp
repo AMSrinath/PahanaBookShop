@@ -9,6 +9,7 @@
     String pageTitle = "Product";
     String idParam = request.getParameter("id");
     InventoryResponse inventory = (InventoryResponse) request.getAttribute("inventoriesData");
+    boolean isHide = (inventory != null);
 
     String baseUrl = request.getContextPath();
     String imagePath = (inventory != null && inventory.getDefaultImage() != null && !inventory.getDefaultImage().isEmpty())
@@ -33,9 +34,11 @@
                 <div class="form-header">
                     <h2 id="form-title"><i class="fas fa-box me-2"></i>Add New Product</h2>
                     <div class="form-buttons">
+                        <% if (!isHide) { %>
                         <button type="button" class="btn btn-outline-secondary" id="clear-btn">
                             Clear
                         </button>
+                        <% } %>
                         <button type="button" class="btn btn-primary" id="save-btn">
                             <i class="fas fa-save me-2"></i>Save
                         </button>
@@ -151,33 +154,41 @@
 
 <script>
     $(document).ready(function () {
+        const baseurl
         let base64ImageData = "";
         const idParam = '<%= (idParam != null) ? idParam : "" %>';
-        console.log("ID Parameter: " + idParam);
         if (idParam) {
             $('#form-title').html('<i class="fas fa-edit me-2"></i>Update Product Type');
             $('#save-btn').html('<i class="fas fa-save me-2"></i>Update');
         }
 
-        toggleAuthorField();
-        $('[name="inventoryTypeId"]').change(toggleAuthorField);
+        // toggleAuthorField();
+        // $('[name="inventoryTypeId"]').change(toggleAuthorField);
 
-        document.getElementById("imageFile").addEventListener("change", function () {
+        const previewSrc = $("#previewImage").attr("src");
+
+        if (previewSrc && !previewSrc.startsWith("data:image") && !previewSrc.includes("default.jpg")) {
+            convertImageToBase64(previewSrc, function (base64) {
+                base64ImageData = base64;
+            });
+        }
+
+        $("#imageFile").on("change", function () {
             const file = this.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function (e) {
                 base64ImageData = e.target.result;
-                document.getElementById("previewImage").src = base64ImageData;
+                $("#previewImage").attr("src", base64ImageData);
             };
-
             reader.readAsDataURL(file);
         });
 
-
         $("#save-btn").click(function() {
-            // const formData = new FormData($("#productForm")[0]);
+            if (!validateForm()){
+                return
+            }
             const newFormData = {
                 productId: $('[name="productId"]').val(),
                 priceListId: $('[name="priceListId"]').val(),
@@ -191,6 +202,7 @@
                 qtyHand: $('[name="qtyHand"]').val(),
                 productImage: base64ImageData,
             };
+
             $.ajax({
                 url: "<%= request.getContextPath() %>/inventory",
                 type: "POST",
@@ -216,7 +228,10 @@
 
     $("#clear-btn").click(function() {
         $("#productForm")[0].reset();
-        $("#previewImage").attr("src", "").hide();
+        $("#previewImage")
+            .attr("src", "<%= request.getContextPath() %>/src/assets/images/default.jpg")
+            .show();
+
         $(".fa-image").show();
     });
 
@@ -251,6 +266,67 @@
             .closest('.mb-3').toggleClass('field-disabled', !isNovel);
 
         if (!isNovel) $('[name="authorId"]').val('');
+    }
+
+    function convertImageToBase64(imageUrl, callback) {
+        fetch(imageUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                    callback(reader.result);
+                };
+                reader.readAsDataURL(blob);
+            })
+            .catch(error => {
+                console.error("Failed to convert image to base64:", error);
+                callback(""); // fallback if fetch fails
+            });
+    }
+
+    function validateForm() {
+        const barcode = $('[name="barcode"]').val();
+        const itemName = $('[name="itemName"]').val();
+        const inventoryTypeId = $('[name="inventoryTypeId"]').val();
+        const retailPrice = $('[name="retailPrice"]').val();
+        const costPrice = $('[name="costPrice"]').val();
+        const qtyHand = $('[name="qtyHand"]').val();
+
+        if (!barcode) {
+            showToast("Barcode is required", "error");
+            return false;
+        }
+
+        if (!itemName) {
+            showToast("Item Name is required", "error");
+            return false;
+        }
+
+        if (!inventoryTypeId) {
+            showToast("Please select Inventory type", "error");
+            return false;
+        }
+
+        if (parseFloat(retailPrice) <= 0 ) {
+            showToast("Retail price is required ", "error");
+            return false;
+        }
+
+        if (parseFloat(costPrice) <= 0 ) {
+            showToast("Cost price is required ", "error");
+            return false;
+        }
+
+        if (parseFloat(retailPrice) < parseFloat(costPrice)) {
+            showToast("Retail price should be greater than or equal to Cost price", "error");
+            return false;
+        }
+
+        if (qtyHand < 0 ) {
+            showToast("Quantity on hand is required ", "error");
+            return false;
+        }
+        return true;
     }
 
 </script>

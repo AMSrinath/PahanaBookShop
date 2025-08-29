@@ -3,7 +3,6 @@ package pahana.education.dao;
 import pahana.education.model.response.*;
 import pahana.education.util.DBConnection;
 import pahana.education.util.DateUtil;
-import pahana.education.util.mappers.InventoryMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

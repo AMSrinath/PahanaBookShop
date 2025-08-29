@@ -22,7 +22,7 @@
     <ul class="nav flex-column sidebar-nav">
         <li class="nav-item">
             <a class="nav-link <%= currentPath.contains("/src/pages/dashboard.jsp") ? "active" : "" %>"
-               href="${pageContext.request.contextPath}/dashboard" data-view="dashboard">
+               href="${pageContext.request.contextPath}/dashboard" data-view="dashboard" style="color: white !important;">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
@@ -70,7 +70,7 @@
         <% } %>
 
         <%
-            boolean isUserMenu = currentPath.contains("/user");
+            boolean isUserMenu = currentPath.contains("/user") || currentPath.contains("/author");
         %>
         <li class="nav-item">
             <a class="nav-link d-flex justify-content-between align-items-center"
@@ -100,8 +100,8 @@
                     <% } %>
 
                     <li>
-                        <a class="nav-link" href="${pageContext.request.contextPath}/user?id=<%= sessionUser.getId() %>&action=my_account">
-                            <i class="fas fa-user-friends me-2" style="color: white !important;"></i>My Account
+                        <a class="nav-link" href="${pageContext.request.contextPath}/user?id=<%= sessionUser.getId() %>&action=my_account" style="color: white !important;">
+                            <i class="fas fa-user-friends me-2"></i>My Account
                         </a>
                     </li>
                 </ul>
@@ -182,12 +182,8 @@
             </div>
         </li>
 
-
-
-
-
         <li class="nav-item mt-4">
-            <a class="nav-link" href="#" style="color: white !important;">
+            <a class="nav-link" href="${pageContext.request.contextPath}/help" style="color: white !important;">
                 <i class="fas fa-question-circle"></i> Help Center
             </a>
         </li>

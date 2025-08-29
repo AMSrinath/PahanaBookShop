@@ -280,7 +280,10 @@
 
     $("#clear-btn").click(function() {
         $("#customerForm")[0].reset();
-        $("#previewImage").attr("src", "").hide();
+        $("#previewImage")
+            .attr("src", "<%= request.getContextPath() %>/src/assets/images/default.jpg")
+            .show();
+
         $(".fa-image").show();
     });
 

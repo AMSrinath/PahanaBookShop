@@ -33,7 +33,6 @@ public class CommonUtil {
             jsonBuffer.append(line);
         }
 
-//        return new JSONObject(jsonBuffer.toString());
         String raw = jsonBuffer.toString().trim();
         System.out.println("Incoming JSON: " + raw);
 

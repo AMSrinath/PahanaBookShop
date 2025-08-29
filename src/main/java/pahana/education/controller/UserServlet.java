@@ -1,17 +1,12 @@
 package pahana.education.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 import org.json.JSONObject;
-import pahana.education.dao.AuthorDao;
-import pahana.education.dao.InventoryDao;
 import pahana.education.dao.UserDAO;
-import pahana.education.model.request.InventoryRequest;
 import pahana.education.model.request.UserRequest;
 import pahana.education.model.response.*;
 import pahana.education.util.CommonResponseUtil;
@@ -19,7 +14,6 @@ import pahana.education.util.CommonUtil;
 import pahana.education.util.FileUploads;
 import pahana.education.util.enums.Gender;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;

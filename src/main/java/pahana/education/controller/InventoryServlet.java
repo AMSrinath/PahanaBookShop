@@ -174,7 +174,15 @@ public class InventoryServlet extends HttpServlet {
                     invRequest.setPriceListId(priceId);
                     inventoryData = InventoryDao.getInstance().updateInventory(invRequest);
                 } else {
-                    inventoryData = InventoryDao.getInstance().createInventory(invRequest);
+                    CommonResponse<String> isBarcodeExist = InventoryDao.getInstance().isBarcodeExists(barcode);
+                    CommonResponse<String> isbnNoExists = InventoryDao.getInstance().isIsbnNoExists(barcode);
+                    if (isBarcodeExist.getCode() == 409) {
+                        inventoryData = isBarcodeExist;
+                    } else if (isbnNoExists.getCode() == 409) {
+                        inventoryData = isbnNoExists;
+                    }else {
+                        inventoryData = InventoryDao.getInstance().createInventory(invRequest);
+                    }
                 }
 
                 String jsonResponse = CommonResponseUtil.getJsonResponse(inventoryData);
@@ -209,9 +217,6 @@ public class InventoryServlet extends HttpServlet {
             if (filePart != null && filePart.getSize() > 0) {
                 imagePath = FileUploads.handleFileUpload(request, filePart, UPLOAD_DIR);
             }
-
-            boolean isBarcodeExist = InventoryDao.getInstance().isBarcodeExists(barcode);
-            boolean isbnNoExists = InventoryDao.getInstance().isIsbnNoExists(barcode);
             CommonResponse<InventoryTypeResponse> inventoryTypeByIdData = InventoryDao.getInstance().getInventoryTypeById(inventoryTypeId);
 
             InventoryRequest invRequest = new InventoryRequest();
