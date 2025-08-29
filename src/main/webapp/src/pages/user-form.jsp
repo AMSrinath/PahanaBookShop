@@ -166,6 +166,7 @@
     </div>
 </div>
 
+<%@ include file="../includes/spinner.jsp" %>
 <%@ include file="../includes/toast-message.jsp" %>
 
 <script>
@@ -255,6 +256,7 @@
                 userImage: base64ImageData,
             };
 
+            $("#spinner-overlay").show();
             $.ajax({
                 url: "<%= request.getContextPath() %>/user",
                 type: "POST",
@@ -263,15 +265,18 @@
                 contentType: "application/json",
                 success: function (response) {
                     if (response.code === 200) {
+                        $("#spinner-overlay").hide();
                         showToast(response.message, "success");
                         setTimeout(() => {
                             window.location.href = "<%= request.getContextPath() %>/user?type=user&action=list";
                         }, 2000);
                     } else {
+                        $("#spinner-overlay").hide();
                         showToast(response.message || "Something went wrong", "error");
                     }
                 },
                 error: function (xhr) {
+                    $("#spinner-overlay").hide();
                     showToast("Request failed: ", xhr);
                 }
             });

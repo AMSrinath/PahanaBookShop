@@ -120,7 +120,7 @@
             const passwordData = {
                 newPassword: newPassword.value
             };
-            console.log("Password change data:", passwordData);
+            $("#spinner-overlay").show();
             $.ajax({
                 url: "<%= request.getContextPath() %>/change-password",
                 type: "POST",
@@ -129,6 +129,7 @@
                 contentType: "application/json",
                 success: function (response) {
                     if (response.code === 200) {
+                        $("#spinner-overlay").hide();
                         showToast(response.message, "success");
                         setTimeout(() => {
                             const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
@@ -136,10 +137,12 @@
                             changePasswordForm.reset();
                         }, 2000);
                     } else {
+                        $("#spinner-overlay").hide();
                         showToast(response.message || "Something went wrong", "error");
                     }
                 },
                 error: function (xhr) {
+                    $("#spinner-overlay").hide();
                     showToast("Request failed: ", xhr);
                 }
             });

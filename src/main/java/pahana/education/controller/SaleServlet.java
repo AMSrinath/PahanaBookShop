@@ -17,17 +17,13 @@ import pahana.education.model.request.InventoryRequest;
 import pahana.education.model.request.SaleItemRequest;
 import pahana.education.model.request.SaleRequest;
 import pahana.education.model.response.*;
-import pahana.education.util.CommonResponseUtil;
-import pahana.education.util.CommonUtil;
-import pahana.education.util.FileUploads;
+import pahana.education.util.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 @WebServlet(name = "saleServlet", value = "/sale")
 public class SaleServlet extends HttpServlet {
@@ -110,7 +106,20 @@ public class SaleServlet extends HttpServlet {
             saleRequest.setInvoiceNo(invoiceNo);
 
             try {
+                CommonResponse<UserDataResponse> customer = UserDAO.getInstance().getUserById(customerId);
                 CommonResponse<String> saleData = SaleDao.getInstance().createSale(saleRequest);
+                if (saleData.getCode()==200) {
+                    Map<String, String> values = new HashMap<>();
+                    values.put("userName", customer.getData().getFirstName());
+                    values.put("saleAmount", saleRequest.getTotalGross()+"");
+                    values.put("invoiceNo", saleRequest.getInvoiceNo());
+                    values.put("saleDate", new Date().toString());
+
+                    String template = TemplateUtil.loadTemplateFromWebapp(request,"sale-complete.html");
+                    String filledHtml = TemplateUtil.fillTemplate(template, values);
+
+                    EmailUtil.sendEmail(customer.getData().getEmail(), "Welcome to Pahan Edu", filledHtml);
+                }
                 String jsonResponse = CommonResponseUtil.getJsonResponse(saleData);
                 out.write(jsonResponse);
                 out.flush();

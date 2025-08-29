@@ -110,8 +110,13 @@
 
         <%
             boolean isReportMenu = currentPath.contains("/src/pages/reports-daily-sales.jsp")
-                    || currentPath.contains("/src/pages/reports-daily-sales.jsp")
-                    || currentPath.contains("/src/pages/product-list.jsp");
+                    || currentPath.contains("/src/pages/product-list.jsp")
+                    || currentPath.contains("/src/pages/reports-product-list.jsp")
+                    || currentPath.contains("/src/pages/reports-product-qty-list.jsp")
+                    || currentPath.contains("/src/pages/reports-cashier-wise-sales.jsp")
+                    || currentPath.contains("/src/pages/reports-cashier-daily-sales.jsp")
+                    || currentPath.contains("/src/pages/reports-customer-purchase.jsp")
+                    || currentPath.contains("/report");
         %>
         <li>
             <a class="nav-link d-flex justify-content-between align-items-center"
@@ -129,7 +134,7 @@
                     <% if ("admin".equals(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/src/pages/reports-daily-sales.jsp" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=daily_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>
                                 Daily Sales
                             </a>
                         </li>
@@ -138,7 +143,7 @@
 
                     <% if (Arrays.asList("admin", "cashier").contains(userRole)) { %>
                         <li>
-                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
+                            <a class="nav-link <%= currentPath.contains("/src/pages/reports-cashier-daily-sales.jsp") ? "active" : "" %>"
                                href="${pageContext.request.contextPath}/report?report_type=cashier_daily_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2" style="color: white !important;"></i>
                                 Cashier Daily Sales
                             </a>

@@ -95,7 +95,20 @@ public class ReportServlet extends HttpServlet {
             }
         }
 
+        if ("daily_sales".equalsIgnoreCase(report_type)) {
+            try {
+                int userId = user.getId();
+                List<ReportCustomerPurchase> reportData = ReportDao.getInstance().dailySalesReport();
+                if (reportData != null) {
+                    request.setAttribute("reportDataList", reportData);
+                    request.getRequestDispatcher("/src/pages/reports-daily-sales.jsp").forward(request, response);
+                    return;
+                }
 
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
     }
 

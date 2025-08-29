@@ -170,8 +170,8 @@
     <p class="text-center">Thank you for your purchase!</p>
 </div>
 
+<%@ include file="../includes/spinner.jsp" %>
 <%@ include file="../includes/toast-message.jsp" %>
-
 <%@ include file="../includes/footer.jsp" %>
 
 <script>
@@ -376,6 +376,7 @@
             } else if(saleData.cashReceived < saleData.total) {
                 showToast("Insufficient cash received", "danger");
             } else {
+                $("#spinner-overlay").show();
                 $.ajax({
                     url: '${pageContext.request.contextPath}/sale?action=complete_sale',
                     method: 'POST',
@@ -383,6 +384,7 @@
                     data: JSON.stringify(saleData),
                     success: function(response) {
                         if (response.code === 200) {
+                            $("#spinner-overlay").hide();
                             showToast(response.message, "success");
                             alert('Sale completed successfully!');
 
@@ -396,10 +398,15 @@
                             currentCustomer = null;
                             $('#product-search').focus();
                         } else {
+                            $("#spinner-overlay").hide();
                             showToast(response.message, "danger");
                             return;
                         }
 
+                    },
+                    error: function (xhr) {
+                        $("#spinner-overlay").hide();
+                        showToast("Request failed: ", xhr);
                     }
                 });
             }

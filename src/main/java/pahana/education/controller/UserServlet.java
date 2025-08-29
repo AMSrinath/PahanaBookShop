@@ -9,9 +9,7 @@ import org.json.JSONObject;
 import pahana.education.dao.UserDAO;
 import pahana.education.model.request.UserRequest;
 import pahana.education.model.response.*;
-import pahana.education.util.CommonResponseUtil;
-import pahana.education.util.CommonUtil;
-import pahana.education.util.FileUploads;
+import pahana.education.util.*;
 import pahana.education.util.enums.Gender;
 
 import java.io.IOException;
@@ -19,7 +17,9 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "userServlet", value = "/user")
 public class UserServlet extends HttpServlet {
@@ -173,6 +173,17 @@ public class UserServlet extends HttpServlet {
                     userData = emailExists;
                 } else {
                     userData = UserDAO.getInstance().createUser(usrRequest);
+                    if (userData.getCode() == 200) {
+                        Map<String, String> values = new HashMap<>();
+                        values.put("userName", usrRequest.getFirstName());
+                        values.put("userEmail", usrRequest.getEmail());
+                        values.put("tempPassword", usrRequest.getPassword());
+
+                        String template = TemplateUtil.loadTemplateFromWebapp(request,"user-created.html");
+                        String filledHtml = TemplateUtil.fillTemplate(template, values);
+
+                        EmailUtil.sendEmail(usrRequest.getEmail(), "Welcome to Pahan Edu", filledHtml);
+                    }
                 }
             }
 

@@ -168,4 +168,37 @@ public class ReportDao {
         return dataList;
     }
 
+    public List<ReportCustomerPurchase> dailySalesReport() throws SQLException {
+        List<ReportCustomerPurchase> dataList = new ArrayList<>();
+        try {
+            Connection conn = DBConnection.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select it.name as productType, i.default_image as productImage, i.name as productName, \n" +
+                    "sid.unit_sell_price as retailPrice, sid.quantity as qty,  si.invoice_no,\n" +
+                    "sid.total_sell_price as total from sales_invoice si \n" +
+                    "left join sales_invoice_detail sid  on sid.inventory_id = si.id \n" +
+                    "left join inventory i on sid.inventory_id = i.id \n" +
+                    "left join inventory_type it on i.inventory_type = it.id\n" +
+                    "where si.is_deleted =0 and DATE(si.invoice_date) = CURDATE()");
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ReportCustomerPurchase data = new ReportCustomerPurchase(
+                        rs.getString("productImage"),
+                        rs.getString("productName"),
+                        rs.getString("productType"),
+                        rs.getInt("retailPrice"),
+                        rs.getInt("qty"),
+                        rs.getInt("total"),
+                        rs.getString("invoice_no")
+                );
+                dataList.add(data);
+            }
+            rs.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dataList;
+    }
+
 }
