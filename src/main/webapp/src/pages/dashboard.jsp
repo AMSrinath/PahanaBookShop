@@ -1,9 +1,94 @@
+<%@ page import="pahana.education.model.response.DashBoardResponse" %>
+<%
+    String pageTitle = "Dashboard";
+    DashBoardResponse dashboardData = null;
+    dashboardData  = (DashBoardResponse) request.getAttribute("dashboardData");
+    if (dashboardData == null) {
+        dashboardData = new DashBoardResponse();
+    }
 
-<% String pageTitle = "Dashboard"; %>
+    double current = dashboardData.getCurrentMonth();
+    double last = dashboardData.getLastMonth();
+    double percentChange = 0;
+    if (last > 0) {
+        percentChange = ((double)(current - last) / last) * 100;
+    } else {
+        percentChange = ((double)(current) / last) * 100;
+    }
+    String progressColor = percentChange >= 0 ? "bg-success" : "bg-danger";
+%>
+
 <%@ include file="../includes/header.jsp" %>
 
 <%@ include file="../includes/dashboard-sidebar.jsp" %>
-sss
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .stat-card {
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        margin-bottom: 25px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-card .icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #4e73df;
+    }
+
+    .stat-card h5 {
+        font-weight: 600;
+        color: #6c757d;
+    }
+
+    .stat-card h2 {
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 10px;
+        background-color: #e9ecef;
+    }
+
+    .progress-bar {
+        transition: width 1s ease-in-out;
+    }
+
+    .user-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+    }
+</style>
+
 <div class="main-content">
     <%@ include file="../includes/dashboard-header.jsp" %>
     <div class="view active" id="dashboard-view">
@@ -13,179 +98,100 @@ sss
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
                         <div class="icon">
-                            <i class="fas fa-shopping-cart"></i>
+                            <i class="fas fa-receipt"></i>
                         </div>
-                        <h5>Monthly Sales</h5>
-                        <h2>$249.95</h2>
-                        <div class="d-flex align-items-center">
-                            <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 67%</span>
-                            <span>vs last month</span>
-                        </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-success" style="width: 67%"></div>
-                        </div>
+                        <h5>Sales Count</h5>
+                        <h2><%= dashboardData.getSaleCount() %></h2>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
                         <div class="icon">
-                            <i class="fas fa-thumbs-up"></i>
+                            <i class="fas fa-sack-dollar"></i>
                         </div>
-                        <h5>Details</h5>
-                        <h2>Engagement</h2>
-                        <div class="d-flex align-items-center">
-                            <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 7.2%</span>
-                            <span>Total Likes</span>
-                        </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-info" style="width: 72%"></div>
-                        </div>
+                        <h5>Total Sales</h5>
+                        <h2>Rs. <%= dashboardData.getSaleTotal() %></h2>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
                         <div class="icon">
-                            <i class="fas fa-chart-line"></i>
+                            <i class="fas fa-calendar-minus"></i>
                         </div>
-                        <h5>Monthly Sales</h5>
-                        <h2>$2,942.32</h2>
-                        <div class="d-flex align-items-center">
-                            <span class="text-warning me-2"><i class="fas fa-arrow-up"></i> 36%</span>
-                            <span>vs last month</span>
-                        </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-warning" style="width: 36%"></div>
-                        </div>
+                        <h5>Lash Month Sales</h5>
+                        <h2>Rs. <%= dashboardData.getLastMonth() %></h2>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6">
                     <div class="card stat-card">
                         <div class="icon">
-                            <i class="fas fa-calendar-alt"></i>
+                            <i class="fas fa-calendar-check"></i>
                         </div>
-                        <h5>Yearly Sales</h5>
-                        <h2>$8,638.32</h2>
-                        <div class="d-flex align-items-center">
-                            <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 80%</span>
-                            <span>vs last year</span>
+                        <h5>Current Monthly Sales</h5>
+                        <h2>Rs. <%= dashboardData.getCurrentMonth() %></h2>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card">
+                        <div class="icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div class="progress mt-2">
-                            <div class="progress-bar bg-success" style="width: 80%"></div>
+                        <h5>Users count</h5>
+                        <h2><%= dashboardData.getUserCount() %></h2>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card">
+                        <div class="icon">
+                            <i class="fas fa-user-tag"></i>
                         </div>
+                        <h5>Customer count</h5>
+                        <h2><%= dashboardData.getCustomerCount() %></h2>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card">
+                        <div class="icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h5>Items count</h5>
+                        <h2><%= dashboardData.getInventoryCount() %></h2>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card">
+                        <div class="icon">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <h5>Stock count</h5>
+                        <h2><%= dashboardData.getStockCount() %></h2>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="card stat-card">
+                        <div class="icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h5>Total Stock</h5>
+                        <h2>Rs. <%= dashboardData.getStockValue() %></h2>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content Row -->
             <div class="row">
-                <!-- Left Column - Chart -->
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h4 class="card-title mb-0">Sales Performance</h4>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                            id="chartDropdown" data-bs-toggle="dropdown">
-                                        Last 30 Days
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
-                                        <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
-                                        <li><a class="dropdown-item" href="#">Last 90 Days</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="chart-placeholder">
-                                <div class="axis-label y-left">0.4</div>
-                                <div class="axis-label y-right">10,500</div>
-                                <div class="axis-label x-bottom">1.1 MAY 12:56</div>
-                                <div class="chart-percentage">+5.9% Total Likes</div>
-
-                                <!-- Chart visualization lines -->
-                                <div
-                                        style="position: absolute; bottom: 30px; left: 10%; width: 80%; height: 1px; background: rgba(0,0,0,0.1);">
-                                </div>
-                                <div
-                                        style="position: absolute; bottom: 80px; left: 10%; width: 80%; height: 1px; background: rgba(0,0,0,0.1);">
-                                </div>
-                                <div
-                                        style="position: absolute; bottom: 130px; left: 10%; width: 80%; height: 1px; background: rgba(0,0,0,0.1);">
-                                </div>
-
-                                <!-- Chart data points -->
-                                <div
-                                        style="position: absolute; bottom: 30px; left: 15%; width: 8px; height: 80px; background-color: var(--primary); border-radius: 4px 4px 0 0;">
-                                </div>
-                                <div
-                                        style="position: absolute; bottom: 30px; left: 30%; width: 8px; height: 120px; background-color: var(--info); border-radius: 4px 4px 0 0;">
-                                </div>
-                                <div
-                                        style="position: absolute; bottom: 30px; left: 45%; width: 8px; height: 160px; background-color: var(--success); border-radius: 4px 4px 0 0;">
-                                </div>
-                                <div
-                                        style="position: absolute; bottom: 30px; left: 60%; width: 8px; height: 100px; background-color: var(--warning); border-radius: 4px 4px 0 0;">
-                                </div>
-                                <div
-                                        style="position: absolute; bottom: 30px; left: 75%; width: 8px; height: 140px; background-color: var(--primary); border-radius: 4px 4px 0 0;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Targets Row -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card target-card">
-                                <h4>Target: 35,098</h4>
-                                <div class="d-flex justify-content-between">
-                                    <span>Duration: 350</span>
-                                    <span class="text-success">82%</span>
-                                </div>
-                                <div class="progress mt-2">
-                                    <div class="progress-bar" style="width: 82%"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="card target-card">
-                                <h4>Target: 34,185</h4>
-                                <div class="d-flex justify-content-between">
-                                    <span>Duration: 800</span>
-                                    <span class="text-warning">65%</span>
-                                </div>
-                                <div class="progress mt-2">
-                                    <div class="progress-bar bg-warning" style="width: 65%"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="card target-card">
-                                <h4>Target: 25,998</h4>
-                                <div class="d-flex justify-content-between">
-                                    <span>Duration: 300</span>
-                                    <span class="text-success">91%</span>
-                                </div>
-                                <div class="progress mt-2">
-                                    <div class="progress-bar bg-success" style="width: 91%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column - Additional Info -->
                 <div class="col-lg-4">
                     <!-- Recent Users -->
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Recent Users</h4>
+                            <h4 class="card-title">Customers</h4>
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <span class="text-success me-2"><i class="fas fa-arrow-up"></i> 6.2%</span>
@@ -241,6 +247,8 @@ sss
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
 

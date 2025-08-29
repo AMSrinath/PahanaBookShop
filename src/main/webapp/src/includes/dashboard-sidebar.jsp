@@ -15,14 +15,15 @@
 
 <div class="sidebar">
     <div class="sidebar-brand">
-        <h3><i class="fas fa-chart-line me-2"></i>Pahana Book</h3>
+<%--        <h3><i class="fas fa-chart-line me-2"></i>Pahana Book</h3>--%>
+        <h3><i class="fa-solid fa-book-bookmark"></i> Pahana Book</h3>
         <h3 style="align-content: center">Shop</h3>
     </div>
 
     <ul class="nav flex-column sidebar-nav">
         <li class="nav-item">
             <a class="nav-link <%= currentPath.contains("/src/pages/dashboard.jsp") ? "active" : "" %>"
-               href="${pageContext.request.contextPath}/src/pages/dashboard.jsp" data-view="dashboard">
+               href="${pageContext.request.contextPath}/dashboard" data-view="dashboard">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </li>
@@ -48,11 +49,11 @@
 
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/product-type-list.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/inventory-type"><i class="fas fa-paint-brush me-2"></i>Product types</a>
+                               href="${pageContext.request.contextPath}/inventory-type" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>Product types</a>
                         </li>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/product-list.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/inventory"><i class="fas fa-copy me-2"></i>Products</a>
+                               href="${pageContext.request.contextPath}/inventory" style="color: white !important;"><i class="fas fa-copy me-2"></i>Products</a>
                         </li>
                 </ul>
             </div>
@@ -63,7 +64,7 @@
         <% if (Arrays.asList("admin", "cashier").contains(userRole)) { %>
             <li class="nav-item">
                 <a class="nav-link <%= currentPath.contains("/src/pages/sales.jsp") ? "active" : "" %>"
-                   href="${pageContext.request.contextPath}/src/pages/sales.jsp">
+                   href="${pageContext.request.contextPath}/src/pages/sales.jsp" style="color: white !important;">
                     <i class="fas fa-shopping-cart"></i> Sales
                 </a>
             </li>
@@ -88,20 +89,20 @@
                     <% if ("admin".equals(userRole)) { %>
                     <li>
                         <a class="nav-link <%= currentPath.contains("/user") ? "active" : "" %>"
-                           href="${pageContext.request.contextPath}/user?type=user"><i class="fas fa-user-tie me-2"></i>User</a>
+                           href="${pageContext.request.contextPath}/user?type=user" style="color: white !important;"><i class="fas fa-user-tie me-2"></i>User</a>
                     </li>
                     <% } %>
 
                     <% if ("admin".equals(userRole)) { %>
                     <li>
                         <a class="nav-link <%= currentPath.contains("/src/pages/author-list.jsp") ? "active" : "" %>"
-                           href="${pageContext.request.contextPath}/author"><i class="fas fa-user-tie me-2"></i>Author</a>
+                           href="${pageContext.request.contextPath}/author" style="color: white !important;"><i class="fas fa-user-tie me-2"></i>Author</a>
                     </li>
                     <% } %>
 
                     <li>
                         <a class="nav-link" href="${pageContext.request.contextPath}/user?id=<%= sessionUser.getId() %>&action=my_account">
-                            <i class="fas fa-user-friends me-2"></i>My Account
+                            <i class="fas fa-user-friends me-2" style="color: white !important;"></i>My Account
                         </a>
                     </li>
                 </ul>
@@ -129,7 +130,7 @@
                     <% if ("admin".equals(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/src/pages/reports-daily-sales.jsp"><i class="fas fa-paint-brush me-2"></i>
+                               href="${pageContext.request.contextPath}/src/pages/reports-daily-sales.jsp" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>
                                 Daily Sales
                             </a>
                         </li>
@@ -139,7 +140,7 @@
                     <% if (Arrays.asList("admin", "cashier").contains(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=cashier_daily_sales"><i class="fas fa-paint-brush me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=cashier_daily_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2" style="color: white !important;"></i>
                                 Cashier Daily Sales
                             </a>
                         </li>
@@ -148,7 +149,7 @@
                     <% if ("admin".equals(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-cashier-wise-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=cashier_wise_sales"><i class="fas fa-paint-brush me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=cashier_wise_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>
                                 Cashier Wise Sales
                             </a>
                         </li>
@@ -157,7 +158,7 @@
                     <% if (Arrays.asList("admin", "customer").contains(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/product-list.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=customer_purchase"><i class="fas fa-copy me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=customer_purchase" style="color: white !important;"><i class="fas fa-copy me-2"></i>
                                 Customer Purchase
                             </a>
                         </li>
@@ -166,14 +167,14 @@
                     <% if (Arrays.asList("admin", "store_keeper").contains(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-product-list.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=product_list"><i class="fas fa-copy me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=product_list" style="color: white !important;"><i class="fas fa-copy me-2"></i>
                                 Product List
                             </a>
                         </li>
 
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-product-qty-list.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=product_qty_list"><i class="fas fa-copy me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=product_qty_list" style="color: white !important;"><i class="fas fa-copy me-2"></i>
                                 Product Stock
                             </a>
                         </li>
@@ -187,19 +188,19 @@
 
 
         <li class="nav-item mt-4">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="#" style="color: white !important;">
                 <i class="fas fa-question-circle"></i> Help Center
             </a>
         </li>
         <li class="nav-item" >
-            <a class="nav-link" href="${pageContext.request.contextPath}/logout">
+            <a class="nav-link" href="${pageContext.request.contextPath}/logout" style="color: white !important;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>
     </ul>
 
     <div class="position-absolute bottom-0 start-0 w-100 p-3 text-center text-white-50">
-        <small>Mithun © 2025</small>
+        <small style="color: white !important;">Mithun © 2025</small>
     </div>
 </div>
 

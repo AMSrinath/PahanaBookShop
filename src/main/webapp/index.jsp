@@ -80,7 +80,7 @@
                         $("#spinner-overlay").hide();
                         showToast(response.message, "success");
                         setTimeout(() => {
-                            window.location.href = "<%= request.getContextPath() %>/src/pages/dashboard.jsp";
+                            window.location.href = "<%= request.getContextPath() %>/dashboard";
                         }, 2000);
                     } else {
                         $("#spinner-overlay").hide();

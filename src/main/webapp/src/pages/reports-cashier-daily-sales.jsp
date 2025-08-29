@@ -13,6 +13,20 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="customer-table">
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-outline-secondary" onclick="window.print()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+
+                    <div class="print-header text-center d-none d-print-block mb-4">
+                        <h2 class="mb-1">Pahana Edu Book Shop</h2>
+                        <p class="mb-0">No.123, Colombo</p>
+                        <p class="mb-0">Phone: 0112345678</p>
+                        <hr>
+                        <h4 class="mt-3">Product List</h4>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead>

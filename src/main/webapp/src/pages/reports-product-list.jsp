@@ -14,6 +14,20 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="customer-table">
+                    <!-- Print Button -->
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-outline-secondary" onclick="window.print()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+
+                    <div class="print-header text-center d-none d-print-block mb-4">
+                        <h2 class="mb-1">Pahana Edu Book Shop</h2>
+                        <p class="mb-0">No.123, Colombo</p>
+                        <p class="mb-0">Phone: 0112345678</p>
+                        <hr>
+                        <h4 class="mt-3">Product List</h4>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead>
@@ -73,50 +87,5 @@
     </div>
 
 </div>
-
-
-<%@ include file="../includes/toast-message.jsp" %>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let deleteId = null;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                deleteId = this.getAttribute('data-id');
-                deleteModal.show();
-            });
-        });
-
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-            if (!deleteId) return;
-
-            const deleteData = {
-                inventoryId: deleteId,
-            };
-            $.ajax({
-                url: "<%= request.getContextPath() %>/inventory",
-                type: "DELETE",
-                data: JSON.stringify(deleteData),
-                processData: false,
-                contentType: "application/json",
-                success: function (response) {
-                    if (response.code === 200) {
-                        deleteModal.hide();
-                        showToast(response.message, "success");
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 2000);
-                    } else {
-                        showToast(response.message || "Something went wrong", "error");
-                    }
-                },
-                error: function (xhr) {
-                    showToast("Request failed: ", xhr);
-                }
-            });
-        });
-    });
-</script>
 
 <%@ include file="../includes/footer.jsp" %>

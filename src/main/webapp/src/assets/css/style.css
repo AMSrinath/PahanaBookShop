@@ -507,3 +507,47 @@ body {
     margin-bottom: 20px;
     font-weight: 600;
 }
+
+
+/*************************  print css */
+
+@media print {
+    @page {
+        size: A4 portrait !important;
+        margin: 20mm;
+    }
+    body * {
+        visibility: hidden;
+    }
+
+    .print-header,
+    .print-header *,
+    .table,
+    .table * {
+        visibility: visible;
+    }
+
+    .print-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .table {
+        margin-top: 180px;
+    }
+
+    .btn,
+    .dashboard-header,
+    .dashboard-sidebar,
+    .toast-message,
+    nav,
+    header {
+        display: none !important;
+    }
+
+    .main-content {
+        padding: 0;
+    }
+}

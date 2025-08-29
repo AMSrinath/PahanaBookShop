@@ -35,11 +35,8 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3><i class="fas fa-users me-2"></i>Product List</h3>
                         <div class="d-flex">
-                            <input type="text" class="form-control me-2" placeholder="Search customers"
+                            <input type="text" class="form-control me-8" placeholder="Search customers"
                                    id="searchInput">
-                            <button class="btn btn-outline-secondary">
-                                <i class="fas fa-filter"></i>
-                            </button>
                         </div>
                     </div>
 
@@ -135,6 +132,21 @@
 </div>
 <%@ include file="../includes/toast-message.jsp" %>
 <script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#customerTableBody tr');
+
+        rows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            row.style.display = rowText.includes(query) ? '' : 'none';
+        });
+
+        const pagination = document.querySelector('.pagination');
+        if (pagination) {
+            pagination.style.display = query.length > 0 ? 'none' : '';
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
         let deleteId = null;
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));

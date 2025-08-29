@@ -47,7 +47,6 @@
                     </div>
 
                     <div class="table-responsive">
-
                         <table class="table table-hover table-sm">
                             <thead>
                             <tr>
@@ -56,7 +55,7 @@
                                 <th>Status</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="customerTableBody">
                             <%
                                 List<InventoryTypeResponse> inventoryTypes = (List<InventoryTypeResponse>) request.getAttribute("inventoryTypes");
                                 if (inventoryTypes != null) {
@@ -136,6 +135,21 @@
 </div>
 
 <script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#customerTableBody tr');
+
+        rows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            row.style.display = rowText.includes(query) ? '' : 'none';
+        });
+
+        const pagination = document.querySelector('.pagination');
+        if (pagination) {
+            pagination.style.display = query.length > 0 ? 'none' : '';
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
         let deleteId = null;
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
