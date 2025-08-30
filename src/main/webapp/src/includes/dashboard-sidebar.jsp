@@ -29,7 +29,8 @@
 
 
         <%
-            boolean isProductMenu = currentPath.contains("/src/pages/product-type-list.jsp") || currentPath.contains("/src/pages/product-list.jsp");
+            boolean isProductMenu = currentPath.contains("/src/pages/product-type-list.jsp")
+                    || currentPath.contains("/src/pages/product-list.jsp");
         %>
         <% if (Arrays.asList("admin", "store_keeper").contains(userRole)) { %>
         <li>
@@ -40,7 +41,7 @@
                aria-expanded="<%= isProductMenu %>"
                style="color: white !important;"
             >
-                <span><i class="fas fa-shopping-cart me-2"></i>Products</span>
+                <span><i class="fas fa-box-open me-2"></i>Products</span>
                 <i class="fas fa-chevron-down"></i>
             </a>
             <div class="collapse <%= isProductMenu ? "show" : "" %>" id="salesMenu">
@@ -126,7 +127,7 @@
                aria-expanded="<%= isReportMenu %>"
                style="color: white !important;"
             >
-                <span><i class="fas fa-shopping-cart me-2"></i>Reports</span>
+                <span><i class="fas fa-file-alt me-2"></i>Reports</span>
                 <i class="fas fa-chevron-down"></i>
             </a>
             <div class="collapse <%= isReportMenu ? "show" : "" %>" id="reportMenu">
@@ -134,7 +135,8 @@
                     <% if ("admin".equals(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-daily-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=daily_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=daily_sales" style="color: white !important;">
+                                <i class="fas fa-copy me-2"></i>
                                 Daily Sales
                             </a>
                         </li>
@@ -144,7 +146,8 @@
                     <% if (Arrays.asList("admin", "cashier").contains(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-cashier-daily-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=cashier_daily_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2" style="color: white !important;"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=cashier_daily_sales" style="color: white !important;">
+                                <i class="fas fa-copy me-2" style="color: white !important;"></i>
                                 Cashier Daily Sales
                             </a>
                         </li>
@@ -153,7 +156,8 @@
                     <% if ("admin".equals(userRole)) { %>
                         <li>
                             <a class="nav-link <%= currentPath.contains("/src/pages/reports-cashier-wise-sales.jsp") ? "active" : "" %>"
-                               href="${pageContext.request.contextPath}/report?report_type=cashier_wise_sales" style="color: white !important;"><i class="fas fa-paint-brush me-2"></i>
+                               href="${pageContext.request.contextPath}/report?report_type=cashier_wise_sales" style="color: white !important;">
+                                <i class="fas fa-copy me-2"></i>
                                 Cashier Wise Sales
                             </a>
                         </li>

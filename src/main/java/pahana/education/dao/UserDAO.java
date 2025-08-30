@@ -319,7 +319,20 @@ public class UserDAO {
         if (rs.next() && rs.getInt(1) > 0) {
             return new CommonResponse<>(409, "Email already exists", null);
         }
-        return new CommonResponse<>(200, "Email is available", null);
+        return new CommonResponse<>(200, "Email Ok", null);
+    }
+
+    public  CommonResponse<String> checkAccountNoExists(String email) throws SQLException {
+        Connection conn = DBConnection.getInstance().getConnection();
+        String sql = "SELECT COUNT(*) FROM user WHERE account_no = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next() && rs.getInt(1) > 0) {
+            return new CommonResponse<>(409, "Customer account.no already exists", null);
+        }
+        return new CommonResponse<>(200, " Account.no Ok", null);
     }
 
     public CommonResponse<String> deleteUser(int id) throws SQLException {
