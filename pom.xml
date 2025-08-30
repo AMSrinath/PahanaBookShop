@@ -7,7 +7,7 @@
     <groupId>pahana.education</groupId>
     <artifactId>PahanaBookShop</artifactId>
     <version>1.0</version>
-    <name>PahanaBookshop</name>
+    <name>pahanaedu</name>
     <packaging>war</packaging>
 
     <properties>

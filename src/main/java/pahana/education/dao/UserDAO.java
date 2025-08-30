@@ -322,11 +322,11 @@ public class UserDAO {
         return new CommonResponse<>(200, "Email Ok", null);
     }
 
-    public  CommonResponse<String> checkAccountNoExists(String email) throws SQLException {
+    public  CommonResponse<String> checkAccountNoExists(String accountNo) throws SQLException {
         Connection conn = DBConnection.getInstance().getConnection();
         String sql = "SELECT COUNT(*) FROM user WHERE account_no = ?";
         PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, email);
+        ps.setString(1, accountNo);
         ResultSet rs = ps.executeQuery();
 
         if (rs.next() && rs.getInt(1) > 0) {

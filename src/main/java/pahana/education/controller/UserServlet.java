@@ -169,8 +169,13 @@ public class UserServlet extends HttpServlet {
                 userData = UserDAO.getInstance().updateUser(usrRequest);
             } else {
                 CommonResponse<String> emailExists = UserDAO.getInstance().checkEmailExists(email);
+                CommonResponse<String> accountNoExists = UserDAO.getInstance().checkAccountNoExists(accountNo);
                 if (emailExists.getCode() == 409) {
                     userData = emailExists;
+
+                } else if (accountNoExists.getCode() == 409) {
+                    userData = accountNoExists;
+
                 } else {
                     userData = UserDAO.getInstance().createUser(usrRequest);
                     if (userData.getCode() == 200) {
