@@ -386,7 +386,7 @@
                         if (response.code === 200) {
                             $("#spinner-overlay").hide();
                             showToast(response.message, "success");
-                            alert('Sale completed successfully!');
+                            // alert('Sale completed successfully!');
 
                             $('#print-bill').click();
 

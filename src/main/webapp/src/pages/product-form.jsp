@@ -154,7 +154,6 @@
 
 <script>
     $(document).ready(function () {
-        const baseurl
         let base64ImageData = "";
         const idParam = '<%= (idParam != null) ? idParam : "" %>';
         if (idParam) {

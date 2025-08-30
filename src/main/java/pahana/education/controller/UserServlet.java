@@ -173,9 +173,6 @@ public class UserServlet extends HttpServlet {
                 if (emailExists.getCode() == 409) {
                     userData = emailExists;
 
-                } else if (accountNoExists.getCode() == 409) {
-                    userData = accountNoExists;
-
                 } else {
                     userData = UserDAO.getInstance().createUser(usrRequest);
                     if (userData.getCode() == 200) {
